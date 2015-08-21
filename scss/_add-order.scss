@@ -1,0 +1,254 @@
+div.choose-menu-container {
+	background-color: green;
+	background-color: #f5f5f5;
+	width: 100%;
+	height: 100%;
+
+}
+h1.choose-menu-header {
+	display: inline-block;
+	float: left;
+	font-family: $font-heading;
+	font-size: 24px;
+	line-height: 50px;
+	text-transform: uppercase;
+}
+div.choose-menu-body-container {
+	height: 566px;
+}
+h2.category-level {
+	font-size: 18px;
+	line-height: 24px;
+}
+
+div.menu-category-outer-container {
+	height: 45px;
+	position: relative;
+	overflow-x: auto;
+	overflow-y: hidden;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+div.menu-category-inner-container {
+	height: 35px;
+	margin-bottom: 10px;
+	// width: 200%;
+	// float: left;
+	display: inline-block;
+	// background-color: blue;
+}
+a.menu-category-item {
+	display: block;
+	float: left;
+
+	color: $primary-color;
+	border: 1px solid $primary-color;
+	margin-bottom: 10px;
+	margin-right: 8px;
+
+	border-radius: 8px;
+	background-color: white;
+	padding: 8px 8px 7px;
+	box-sizing: border-box;
+	height: 35px;
+
+	font-size: 18px;
+	line-height: 18px;
+	&.active {
+		color: white;
+		background-color: $primary-color;
+	}
+}
+div.menu-catalogue-container {
+	box-sizing: border-box;
+
+	border: 1px solid #d7d7d7;
+
+	background-color: white;
+	width: 616px;
+	height: 420px;
+
+	overflow: auto;
+	padding: 9px;
+}
+div.menu-catalogue-item {
+	display: block;
+	float: left;
+	box-sizing: border-box;
+	margin: 10px;
+	width: 129px;
+	overflow: hidden;
+
+	text-align: center;
+	// background-color: padding: ;k;
+
+	
+}
+h2.menu-thumb-title {
+	font-size: 14px;
+	line-height: 14px;
+	// height: 14px;
+	overflow: hidden;
+	padding-top: 10px;
+}
+img.menu-catalogue-picture {
+	display: block;
+
+	border-radius: 8px;
+	overflow: hidden;
+	width: 129px;
+	height: 129px;
+	background-color: purple;
+}
+
+
+
+
+a.btn-close {
+	position: relative;
+	display: inline-block;
+	float: right;
+	border-radius: 100%;
+	width: 50px;
+	height: 50px;
+	text-align: center;
+
+	-moz-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+	-webkit-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+
+	color: white;
+
+	&:after {
+		display: block;
+		content: "x";
+		line-height: 34px;
+		font-size: 24px;
+		height: 40px;
+		width: 40px;
+		position: absolute;
+		left: 0;
+		right: 0;
+		text-align: center;
+		margin: 0 auto;
+		top: 5px;
+		border-radius: 100%;
+
+		color: white;
+		// background: white;
+		background: -webkit-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Safari 5.1 to 6.0 */
+		background: -o-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Opera 11.1 to 12.0 */
+		background: -moz-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Firefox 3.6 to 15 */
+		background: linear-gradient($primary-gradient-start, $primary-gradient-end); /* Standard syntax */
+		
+	}
+
+}
+a.btn-close {
+	position: relative;
+	display: inline-block;
+	float: right;
+	border-radius: 100%;
+	width: 50px;
+	height: 50px;
+	text-align: center;
+
+	-moz-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+	-webkit-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+
+	color: white;
+
+	&:after {
+		display: block;
+		content: "x";
+		line-height: 34px;
+		font-size: 24px;
+		height: 40px;
+		width: 40px;
+		position: absolute;
+		left: 0;
+		right: 0;
+		text-align: center;
+		margin: 0 auto;
+		top: 5px;
+		border-radius: 100%;
+
+		color: white;
+		// background: white;
+		background: -webkit-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Safari 5.1 to 6.0 */
+		background: -o-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Opera 11.1 to 12.0 */
+		background: -moz-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Firefox 3.6 to 15 */
+		background: linear-gradient($primary-gradient-start, $primary-gradient-end); /* Standard syntax */
+		
+	}
+
+}
+
+
+a.btn-add-order {
+	position: relative;
+	display: inline-block;
+	float: right;
+	border-radius: 100%;
+	width: 50px;
+	height: 50px;
+	text-align: center;
+
+	-moz-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+	-webkit-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+
+	color: white;
+
+	&:after {
+		display: block;
+		content: "+";
+		line-height: 40px;
+		font-size: 24px;
+		height: 40px;
+		width: 40px;
+		position: absolute;
+		left: 0;
+		right: 0;
+		text-align: center;
+		margin: 0 auto;
+		top: 5px;
+		border-radius: 100%;
+
+		// background: white;
+		background: -webkit-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Safari 5.1 to 6.0 */
+		background: -o-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Opera 11.1 to 12.0 */
+		background: -moz-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Firefox 3.6 to 15 */
+		background: linear-gradient($primary-gradient-start, $primary-gradient-end); /* Standard syntax */
+		
+	}
+
+}
+a.btn-disabled {
+	-moz-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+	-webkit-box-shadow: inset 0 0 8px rgba(0,0,0, 0.25);
+
+	color: grey;
+
+	&:after {
+		display: block;
+		content: "+";
+		line-height: 40px;
+		font-size: 24px;
+		height: 40px;
+		width: 40px;
+		position: absolute;
+		left: 0;
+		right: 0;
+		text-align: center;
+		margin: 0 auto;
+		top: 5px;
+		border-radius: 100%;
+
+		// background: white;
+		background: -webkit-linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* For Safari 5.1 to 6.0 */
+		background: -o-linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* For Opera 11.1 to 12.0 */
+		background: -moz-linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* For Firefox 3.6 to 15 */
+		background: linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* Standard syntax */
+		
+	}
+
+}
