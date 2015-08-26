@@ -1,0 +1,158 @@
+<ion-view view-title="Title">
+  <ion-content>
+  	<div class="left-container">
+			<div class="left-inner-container">
+				<a class="btn-add-order btn-disabled" ng-click="showMenu()"></a>
+				<div class="order-table-properties">
+					<h2 class="order-table-number">Order {{order.id}}</h2>
+					<h3 class="order-table-customer">{{order.name}}</h3>
+				</div>
+				<table class="order-list">
+					<thead>
+						<tr>
+							<th width="52%">Nama</th>
+							<th width="8%">Qty</th>
+							<th width="20%">Satuan</th>
+							<th width="20%">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="order_item in order_items">
+							<td width="52%">{{order_item.menu.name}}</td>
+							<td width="8%">{{order_item.quantity}}</td>
+							<td width="20%">{{order_item.menu.price | currency:"Rp "}}</td>
+							<td width="20%">{{order_item.menu.price * order_item.quantity | currency:"Rp "}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="order-counts cf">
+					<div class="order-count-item">
+						<p>Diskon</p>
+						<h2>{{discount | currency:"Rp "}}</h2>
+					</div>
+					<div class="order-count-item">
+						<p>Pajak</p>
+						<h2>{{tax | currency:"Rp "}}</h2>
+					</div>
+					<div class="order-count-item">
+						<p>Sub-Total</p>
+						<h2>{{total | currency:"Rp "}}</h2>
+					</div>
+					<div class="order-count-item">
+						<p>TOTAL</p>
+						<h2 class="order-total">{{total + tax | currency:"Rp "}}</h2>
+					</div>
+					<div class="order-count-item">
+						<p>Surcharge</p>
+						<h2>Rp 0</h2>
+					</div>
+					<div class="order-count-item">
+						<p>Ditagihkan</p>
+						<h2 class="order-total-charge">{{total + tax - discount | currency:"Rp "}}</h2>
+					</div>
+				</div>
+			</div>
+			<ul class="transactional-buttons-container">
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="void()"></a>
+					<p>Void</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-split" href="#" ng-click="split()"></a>
+					<p>Bayar Pisah</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="discount()"></a>
+					<p>Diskon Rp</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-diskon-persen" href="#" ng-click="discountPercent()"></a>
+					<p>Diskon %</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="print()"></a>
+					<p>Print</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator()"></a>
+					<p>Pembayaran</p>
+
+				</li>
+			</ul>
+		</div>
+		<div class="right-container cf">
+			<div class="choose-menu-container" ng-show="show=='menu'">
+				<div class="choose-menu-header-container cf">
+					<h1 class="choose-menu-header">Pilih Menu</h1>
+					<a ng-click="hideMenu()" class="btn-close"></a>
+				</div>
+				<div class="choose-menu-body-container">
+					<div class="menu-category-selector">
+						<div class="menu-category-main">
+							<h2 class="category-level">Category</h2>
+							<div class="menu-category-outer-container cf">
+								<div class="menu-category-inner-container">
+									<a class="menu-category-item active" ng-repeat="category in categories" ng-click="showSub(category)" ng-class="{active: activeCat == category.id}">{{category.name}}</a>
+								</div>
+							</div>
+						</div>
+						<div class="menu-category-sub" ng-show="activeCat">
+							<h2 class="category-level">Sub-Category</h2>
+							<div class="menu-category-outer-container cf">
+								<div class="menu-category-inner-container">
+									<a ng-repeat="sub_category in sub_categories" ng-click="showMenus(sub_category)" class="menu-category-item" ng-class="{active: activeSubCat == sub_category.id}">{{sub_category.name}}</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="menu-catalogue-container cf">
+						<div class="menu-catalogue-item" ng-repeat="menu in menus" ng-click="addMenu(menu)">
+							<img ng-src="{{menu.image}}" alt="" class="menu-catalogue-picture">
+							<h2 class="menu-thumb-title">{{menu.name}}</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="calculator-container" ng-show="show=='calculator'">
+				<div class="calculator-displays-container">
+					<div class="calculator-display-lable-container">
+						<p class="calculator-display-lable-1">Ditagihkan</p>
+						<p class="calculator-display-lable-2">Dibayar</p>
+						<p class="calculator-display-lable-3">Kembali</p>
+					</div>
+					<div class="calculator-display-screen-container cf">
+						<div class="calculator-display-screen calculator-large-screen cf">
+							<h2>Rp 105.050</h2>
+							<h2>Rp 110.000</h2>
+						</div>
+						<div class="calculator-display-screen calculator-small-screen">
+							<h2>Rp 4.950</h2>
+						</div>
+					</div>
+				</div>
+				<div class="calculator-buttons-container">
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">7</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">8</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">9</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-primary">10.000</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">4</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">5</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">6</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-primary">50.000</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">1</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">2</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">3</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-primary">100.000</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary btn-calc-clear">C</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">0</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">00</a>
+					<a href="#" class="btn-corner-rounded btn-rounded-secondary">Del</a>
+				</div>
+			</div>
+			<div class="right-right-container" ng-show="show=='calculator'">
+				
+				<a class="btn-rounded btn-done" ng-click="pay()">Selesai</a>
+			</div>
+		</div>
+  </ion-content>
+</ion-view>
