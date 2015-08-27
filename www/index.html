@@ -10,8 +10,9 @@
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
-    <script src="lib/ionic/js/angular/angular-resource.min.js"></script>
-
+    <script src="lib/angular-resource/angular-resource.min.js"></script>
+    
+    <script src="lib/angular-http-auth/src/http-auth-interceptor.js"></script>
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
@@ -23,7 +24,6 @@
   <body ng-app="erestoCashier">
 
     <div class="android-bar"></div>
-    <div class="android-onscreen-buttons-bar"></div>
     <div class="top-bar">
       <div class="page-heading">
         <h1>Bober Cafe</h1>
@@ -37,5 +37,6 @@
         <!-- Center content -->
       </ion-nav-view>
     </div>
+    <div class="android-onscreen-buttons-bar"></div>
   </body>
 </html>

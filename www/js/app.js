@@ -1,9 +1,4 @@
-// Ionic Starter App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-var app = angular.module('erestoCashier', ['ionic', 'ngResource'])
+angular.module('erestoCashier', ['ionic', 'ngResource', 'erestoCashier.services', 'erestoCashier.controllers'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -15,6 +10,19 @@ var app = angular.module('erestoCashier', ['ionic', 'ngResource'])
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
+    $ionicModal.fromTemplateUrl('templates/login.html', function(modal) {
+        $scope.loginModal = modal;
+      },
+      {
+        scope: $scope,
+        animation: 'slide-in-up',
+        focusFirstInput: true
+      }
+    );
+  //Be sure to cleanup the modal by removing it from the DOM
+    $scope.$on('$destroy', function() {
+      $scope.loginModal.remove();
+    });
   });
 })
 
