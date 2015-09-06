@@ -1,0 +1,22 @@
+<div class="list list-inset" ng-if="orderItem.product.choices">
+
+  <label class="item item-radio" ng-repeat="choice in orderItem.product.choices">
+    <input type="radio" ng-value="choice.name" ng-model="orderItem.choice">
+    <div class="item-content">
+      {{choice.name}}
+    </div>
+    <i class="radio-icon ion-checkmark"></i>
+  </label>
+
+</div>
+
+<div class="list list-inset">
+  <label class="item item-input item-stacked-label">
+  	<span class="input-label">Input Quantity</span>
+    <input type="text" placeholder="Quantity" ng-model="orderItem.quantity">
+  </label>
+  <label class="item item-input item-stacked-label">
+  	<span class="input-label">Input Note</span>
+    <input type="text" placeholder="Note" ng-model="orderItem.note">
+  </label>
+</div>

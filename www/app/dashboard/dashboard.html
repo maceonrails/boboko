@@ -1,12 +1,12 @@
 <ion-view view-title="Title">
   <ion-content>
 		<div class="tables-container">
-			<div class="table-area-container" ng-repeat="room in rooms">
+			<div class="table-area-container" ng-repeat="(location, tables) in tables">
 				<div class="table-area-header">
-					<h2 class="table-area-name">{{room.name}}</h2>
+					<h2 class="table-area-name">{{location}}</h2>
 				</div>
 				<ul class="table-area-inner-container cf">
-					<li class="table-occupied" ng-repeat="table in room.tables" ng-class="{'table-occupied': table.used}">{{table.number}}</li>
+					<li ng-click="showTable(table)" ng-repeat="table in tables" ng-class="{'table-occupied': table.order_id}">{{table.name}}</li>
 				</ul>
 			</div>
 		</div>
@@ -16,7 +16,7 @@
 				<a class="btn-add-queue" ng-click="addOrder()"></a>
 			</div>
 			<ul class="take-away-queue-container cf">
-				<li ng-repeat="order in waiting_orders">{{order.name}}<span>#{{order.id}}</li>
+				<li ng-click="showOrder(order.id)" ng-repeat="order in orders">{{order.name}}<span>#{{++$index}}</li>
 			</ul>
 		</div>
 	</ion-content>

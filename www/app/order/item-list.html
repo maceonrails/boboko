@@ -1,0 +1,49 @@
+<a class="btn-add-order btn-disabled" ng-click="$parent.showMenu()"></a>
+<div class="order-table-properties">
+	<h2 class="order-table-number">Order</h2>
+	<h3 class="order-table-customer">{{order.name}}</h3>
+</div>
+<table class="order-list">
+	<thead>
+		<tr>
+			<th width="52%">Nama</th>
+			<th width="8%">Qty</th>
+			<th width="20%">Satuan</th>
+			<th width="20%">Total</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-click="showItemDetail(orderItem)" ng-repeat="orderItem in order.orderItems">
+			<td width="52%">{{orderItem.product.name}}</td>
+			<td width="8%">{{orderItem.quantity}}</td>
+			<td width="20%">{{orderItem.product.price | currency:"Rp "}}</td>
+			<td width="20%">{{orderItem.product.price * orderItem.quantity | currency:"Rp "}}</td>
+		</tr>
+	</tbody>
+</table>
+<div class="order-counts cf">
+	<div class="order-count-item">
+		<p>Diskon</p>
+		<h2>{{order.discountAmount | currency:"Rp "}}</h2>
+	</div>
+	<div class="order-count-item">
+		<p>Sub-Total</p>
+		<h2>{{getSubTotal(order) | currency:"Rp "}}</h2>
+	</div>
+	<div class="order-count-item">
+		<p>PPN</p>
+		<h2>{{getTax('ppn', order) | currency:"Rp "}}</h2>
+	</div>
+	<div class="order-count-item">
+		<p>TOTAL</p>
+		<h2 class="order-total">{{getTotal(order) | currency:"Rp "}}</h2>
+	</div>
+	<div class="order-count-item">
+		<p>Service</p>
+		<h2>{{getTax('service', order) | currency:"Rp "}}</h2>
+	</div>
+	<div class="order-count-item">
+		<p>Ditagihkan</p>
+		<h2 class="order-total-charge">{{getPaidAmount(order) | currency:"Rp "}}</h2>
+	</div>
+</div>

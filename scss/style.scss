@@ -17,8 +17,23 @@ div.android-onscreen-buttons-bar {
 }
 // FOR DEMO PURPOSE, MIMICKING LENOVO YOGA'S SCREEN AREA - DITCH ON FINAL
 
+// Fixing some style
+h2 {
+	margin-top: 0px;
+}
+
+h2 + h2, h2 + h3 {
+	margin-top: 0px;
+}
 
 
+// Fixing some style
+
+// override Ionic Css
+
+.popup-container .popup {
+	width: 370px;
+}
 
 
 // CLEAR FLOATS 
@@ -273,6 +288,8 @@ a.btn-add-queue {
 }
 ul.take-away-queue-container {
 	padding: 1px 5px;
+	overflow: auto;
+  height: 90%;
 	li {
 		font-size: 18px;
 		font-family: $font-heading;
@@ -541,7 +558,7 @@ div.calculator-container {
 
 	// width: 504px;
 	// width: 464px;
-	width: 480px;
+	width: 592px;
 
 }
 
@@ -603,11 +620,10 @@ div.calculator-display-screen {
 		margin-right: 0;
 	}
 
-	h2 {
-		font-size: 23px;
-		font-weight: bold;
-		line-height: 59px;
-		padding: 5px;
+	div {
+		overflow-x: auto;
+    white-space: nowrap;
+
 		&:first-child {
 			float: left;
 		}
@@ -615,13 +631,25 @@ div.calculator-display-screen {
 			float: right;
 		}
 	}
+	h2 {
+		font-size: 23px;
+		font-weight: bold;
+		line-height: 59px;
+		padding: 5px;
+	}
+	
 }
 div.calculator-large-screen {
 	width: 325px;
+	div {
+		width: 152px;
+	}
 }
 div.calculator-small-screen {
 	width: 141px;
-
+	div {
+		width: 120px;
+	}
 }
 
 .btn-corner-rounded {
@@ -630,10 +658,10 @@ div.calculator-small-screen {
 	float: left;
 
 
-		width: 96px;
-		height: 102px;
+		width: 110px;
+		height: 116px;
 		// top: 7px;
-	padding: 7px;
+		padding: 7px;
 		border-radius: 5px;
 
 	text-align: center;
@@ -717,7 +745,7 @@ div.calculator-small-screen {
 div.right-right-container {
 	// width: 112px;
 	width: 110px;
-	height: 100%;
+	height: 20%;
 	float: right;
 	margin: 0;
 	// background-color: green;
@@ -732,8 +760,8 @@ a.btn-done {
 	right: 0;
 	bottom: 0;
 
-	width: 81px;
-	height: 81px;
+	width: 95px;
+	height: 95px;
 
 	color: white;
 	font-size: 21px;

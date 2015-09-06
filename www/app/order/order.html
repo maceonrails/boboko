@@ -1,0 +1,43 @@
+<ion-view view-title="Title">
+  <ion-content>
+  	<div class="left-container">
+			<div class="left-inner-container" item-list order="order"></div>
+			<ul class="transactional-buttons-container">
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, orderItems)"></a>
+					<p>Void</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-split" href="#" ng-click="showSplit()"></a>
+					<p>Bayar Pisah</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="addAmountDiscount()"></a>
+					<p>Diskon Rp</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-diskon-persen" href="#" ng-click="addPercentDiscount()"></a>
+					<p>Diskon %</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="saveOrder(order)"></a>
+					<p>Print</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator()"></a>
+					<p>Pembayaran</p>
+
+				</li>
+			</ul>
+		</div>
+		<div class="right-container cf">
+			<div class="choose-menu-container" ng-include="'app/order/menu.html'" scope="" onload="" ng-show="show=='menu'">
+			</div>
+
+			<div class="left-inner-container" item-list order="splitOrder" ng-show="show=='split'"></div>
+
+			<div class="calculator-container" ng-include="'app/order/payment.html'" scope="" onload="" ng-show="show=='calculator'">
+			</div>
+		</div>
+  </ion-content>
+</ion-view>

@@ -1,25 +1,21 @@
-angular.module('erestoCashier.controllers', [])
-  
-.controller('LoginCtrl', function($scope, $http, $state, AuthenticationService) {
-  $scope.message = "";
-  
-  $scope.user = {
-    username: null,
-    password: null
-  };
- 
-  $scope.login = function() {
-    AuthenticationService.login($scope.user);
-  };
- 
-  $scope.$on('event:auth-loginRequired', function(e, rejection) {
-    $scope.loginModal.show();
+angular
+	.module('erestoCashier.controllers', [])
+	.controller('AppCtrl', AppCtrl)
+	.controller('LoginCtrl', LoginCtrl)
+	.controller('TableCtrl', TableCtrl)
+	.controller('OrderCtrl', OrderCtrl)
+
+
+function AppCtrl($scope, $state, $ionicModal) {
+	$scope.$on('event:auth-loginRequired', function(e, rejection) {
+    console.log('handling login required');
+    $state.go('app.login', {}, {reload: true, inherit: false});
   });
  
   $scope.$on('event:auth-loginConfirmed', function() {
-     $scope.username = null;
-     $scope.password = null;
-     $scope.loginModal.hide();
+	 $scope.username = null;
+	 $scope.password = null;
+	 $state.go('app.home', {}, {reload: true, inherit: false});
   });
   
   $scope.$on('event:auth-login-failed', function(e, status) {
@@ -31,16 +27,37 @@ angular.module('erestoCashier.controllers', [])
   });
  
   $scope.$on('event:auth-logout-complete', function() {
+    console.log("logout complete");
     $state.go('app.home', {}, {reload: true, inherit: false});
   });    	
-})
+}
+  
 
-.controller('HomeCtrl', function($scope, $state, $ionicPopup, OrderService, Room){
-	$scope.rooms = Room.index();
-	$scope.waitingOrders = OrderService.waitingList();
+function LoginCtrl($scope, $http, $state, AuthenticationService, localStorageService) {
+  $scope.message = "";
+  localStorageService.remove('token');
+  $scope.user = {
+    username: null,
+    password: null
+  };
+ 
+  $scope.login = function() {
+    AuthenticationService.login($scope.user);
+  };
+}
+
+
+function TableCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService){
+	TableService.getAll().then(function (tables) {
+		$scope.tables = _.groupBy(tables, 'location');
+	})
+
+	OrderService.getWaitingOrders().then(function (orders) {
+		$scope.orders = orders;
+	})
+
 	$scope.addOrder = function() {
 	 	$scope.order = {};
-
 	 	// An elaborate, custom popup
 	 	var myPopup = $ionicPopup.show({
 	   	template: '<input type="text" ng-model="order.name">',
@@ -57,9 +74,9 @@ angular.module('erestoCashier.controllers', [])
 	           	//don't allow the user to close unless he enters wifi password
 	           	e.preventDefault();
 	         	} else {
-	         		order = OrderService.new($scope.order)
-				   		$scope.orders.push(order);
-			     		$state.go('order', {id: $scope.order.id});
+	         		OrderService.create($scope.order).then(function(order) {
+			     			$state.go('app.order', {id: order.id});
+	         		})
 	         	}
 	       	}
 	     	},
@@ -68,15 +85,30 @@ angular.module('erestoCashier.controllers', [])
 	 	myPopup.then(function(name) {	 		
 	 	});
 	};
-})
+}
 
-.controller('OrderCtrl', function($scope, $stateParams, $filter, Order, Category, SubCategory, OrderItem, Menu){
-	
-	$scope.order = OrderService($stateParams.id);
-	
-	$scope.categories = Category.index();
+
+function OrderCtrl($scope, $stateParams, $filter, OrderService, CategoryService, OrderItemService, TaxService, DiscountService){
+	CategoryService.getAll().then(function (categories) {
+		$scope.categories = categories;
+	});
+	$scope.order = OrderService.find($stateParams.id).$object;
+	$scope.orderItems = [];
+	$scope.total = 0;
+	$scope.should_paid = 0;
+	$scope.pay = 0;
+	$scope.discount = 0.05;
+
+	calculate()
+
+	function calculate() {
+		$scope.subTotal = OrderService.getSubTotal($scope.orderItems);
+		$scope.total = $scope.subTotal + ($scope.totalTaxes * $scope.total)
+		$scope.totalTaxes = TaxService.calculateTax($scope.total);
+		$scope.should_paid = $scope.total + ($scope.totalTaxes * $scope.total) - ($scope.discount * $scope.total);
+	}
+
 	$scope.showMenu = function() {
-		debugger
 		$scope.show = 'menu';
 	};
 	$scope.hideMenu = function() {
@@ -86,29 +118,42 @@ angular.module('erestoCashier.controllers', [])
 		$scope.show = 'calculator';
 	};
 
-	$scope.showSub = function(category) {
-		Category.show(category).$promise.then(function(category) {
-   		$scope.sub_categories = category.sub_categories;
-			$scope.activeCat = category.id;
-    });
+	$scope.showSplit = function() {
+		$scope.show = 'split';
 	}
 
-	$scope.showMenus = function (sub_category) {
-		SubCategory.show(sub_category).$promise.then(function(sub_category) {
-   		$scope.menus = sub_category.menus;
-			$scope.activeCat = sub_category.id;
-    });
+	$scope.addMenu = function(product) {
+		var orderItem = { quantity: 1, product: product }
+		var sameItem = false;
+		for (i in $scope.orderItems) {
+			if ($scope.orderItems[i].product.id === product.id) {
+				$scope.orderItems[i].quantity++;
+				sameItem = true;
+				break;
+			} 
+		}
+		if ($scope.orderItems.length === 0 || !sameItem) {
+			$scope.orderItems.push(orderItem);
+		}
+		calculate();
 	}
 
-	$scope.addMenu = function (menu) {
-		// var found = $filter('filter')($scope.order_items, {menu_id: menu.id}, true);
-  //    if (found.length) {
-  //    } else {
-  //    }
-		// var order_item = new OrderItem({menu_id: menu.id, quantity: 1}) 
-		OrderItem.create({order_id: $scope.order.id, menu_id: menu.id, quantity: 1}).$promise.then(function(orderItem) {
-   		$scope.order_items.push(orderItem);
-    });
+	$scope.removeMenu = function(index) {
+		$scope.orderItems.splice(index, 1);
+		calculate();
 	}
 
-})
+	$scope.showItemPopup = function(index) {
+		
+	} 
+
+	$scope.showSubCategory = function(category) {
+   	$scope.subCategories = category.getList('product_sub_categories').$object;
+		$scope.activeCat = category.id;
+		$scope.activeSubCat = null;
+	}
+	$scope.showProducts = function(subCategory) {
+		$scope.products = subCategory.getList('products').$object;
+		$scope.activeSubCat = subCategory.id;
+	}
+}

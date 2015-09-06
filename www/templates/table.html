@@ -1,0 +1,23 @@
+<ion-view view-title="Title">
+  <ion-content>
+		<div class="tables-container">
+			<div class="table-area-container" ng-repeat="(location, tables) in tables">
+				<div class="table-area-header">
+					<h2 class="table-area-name">{{location}}</h2>
+				</div>
+				<ul class="table-area-inner-container cf">
+					<li ng-repeat="table in tables" ng-class="{'table-occupied': table.status == 'occupied'}">{{table.name}}</li>
+				</ul>
+			</div>
+		</div>
+		<div class="take-away-container">
+			<div class="take-away-header cf">
+				<h2 class="take-away-name">Take Away Queue</h2>
+				<a class="btn-add-queue" ng-click="addOrder()"></a>
+			</div>
+			<ul class="take-away-queue-container cf">
+				<li ng-repeat="order in waiting_orders">{{order.name}}<span>#{{order.id}}</li>
+			</ul>
+		</div>
+	</ion-content>
+</ion-view>

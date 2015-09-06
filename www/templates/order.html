@@ -4,7 +4,7 @@
 			<div class="left-inner-container">
 				<a class="btn-add-order btn-disabled" ng-click="showMenu()"></a>
 				<div class="order-table-properties">
-					<h2 class="order-table-number">Order {{order.id}}</h2>
+					<h2 class="order-table-number">Order</h2>
 					<h3 class="order-table-customer">{{order.name}}</h3>
 				</div>
 				<table class="order-list">
@@ -17,38 +17,38 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="order_item in order_items">
-							<td width="52%">{{order_item.menu.name}}</td>
-							<td width="8%">{{order_item.quantity}}</td>
-							<td width="20%">{{order_item.menu.price | currency:"Rp "}}</td>
-							<td width="20%">{{order_item.menu.price * order_item.quantity | currency:"Rp "}}</td>
+						<tr ng-repeat="orderItem in orderItems">
+							<td width="52%">{{orderItem.product.name}}</td>
+							<td width="8%">{{orderItem.quantity}}</td>
+							<td width="20%">{{orderItem.product.price | currency:"Rp "}}</td>
+							<td width="20%">{{orderItem.product.price * orderItem.quantity | currency:"Rp "}}</td>
 						</tr>
 					</tbody>
 				</table>
 				<div class="order-counts cf">
 					<div class="order-count-item">
 						<p>Diskon</p>
-						<h2>{{discount | currency:"Rp "}}</h2>
+						<h2>{{getDiscountAmount(order) | currency:"Rp "}}</h2>
 					</div>
 					<div class="order-count-item">
-						<p>Pajak</p>
-						<h2>{{tax | currency:"Rp "}}</h2>
+						<p>PPN</p>
+						<h2>{{getPpnTax(order) | currency:"Rp "}}</h2>
 					</div>
 					<div class="order-count-item">
 						<p>Sub-Total</p>
-						<h2>{{total | currency:"Rp "}}</h2>
+						<h2>{{getSubTotal(order) | currency:"Rp "}}</h2>
 					</div>
 					<div class="order-count-item">
 						<p>TOTAL</p>
-						<h2 class="order-total">{{total + tax | currency:"Rp "}}</h2>
+						<h2 class="order-total">{{getTotal(order) | currency:"Rp "}}</h2>
 					</div>
 					<div class="order-count-item">
-						<p>Surcharge</p>
-						<h2>Rp 0</h2>
+						<p>Service</p>
+						<h2>{{getServiceTax(order) | currency:"Rp "}}</h2>
 					</div>
 					<div class="order-count-item">
 						<p>Ditagihkan</p>
-						<h2 class="order-total-charge">{{total + tax - discount | currency:"Rp "}}</h2>
+						<h2 class="order-total-charge">{{getPaidAmount(order) | currency:"Rp "}}</h2>
 					</div>
 				</div>
 			</div>
@@ -70,7 +70,7 @@
 					<p>Diskon %</p>
 				</li>
 				<li>
-					<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="print()"></a>
+					<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="saveOrder(order)"></a>
 					<p>Print</p>
 				</li>
 				<li>
@@ -92,7 +92,7 @@
 							<h2 class="category-level">Category</h2>
 							<div class="menu-category-outer-container cf">
 								<div class="menu-category-inner-container">
-									<a class="menu-category-item active" ng-repeat="category in categories" ng-click="showSub(category)" ng-class="{active: activeCat == category.id}">{{category.name}}</a>
+									<a class="menu-category-item" ng-repeat="category in categories" ng-click="showSubCategory(category)" ng-class="{active: activeCat == category.id}">{{category.name}}</a>
 								</div>
 							</div>
 						</div>
@@ -100,15 +100,15 @@
 							<h2 class="category-level">Sub-Category</h2>
 							<div class="menu-category-outer-container cf">
 								<div class="menu-category-inner-container">
-									<a ng-repeat="sub_category in sub_categories" ng-click="showMenus(sub_category)" class="menu-category-item" ng-class="{active: activeSubCat == sub_category.id}">{{sub_category.name}}</a>
+									<a ng-repeat="subCategory in subCategories" ng-click="showProducts(subCategory)" class="menu-category-item" ng-class="{active: activeSubCat == subCategory.id}">{{subCategory.name}}</a>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="menu-catalogue-container cf">
-						<div class="menu-catalogue-item" ng-repeat="menu in menus" ng-click="addMenu(menu)">
-							<img ng-src="{{menu.image}}" alt="" class="menu-catalogue-picture">
-							<h2 class="menu-thumb-title">{{menu.name}}</h2>
+					<div class="menu-catalogue-container cf" ng-show="activeSubCat">
+						<div class="menu-catalogue-item pull-left" ng-repeat="product in products" ng-click="addMenu(product)">
+							<img ng-src="{{product.picture}}" alt="" class="menu-catalogue-picture">
+							<h2 class="menu-thumb-title">{{product.name}}</h2>
 						</div>
 					</div>
 				</div>
@@ -122,11 +122,11 @@
 					</div>
 					<div class="calculator-display-screen-container cf">
 						<div class="calculator-display-screen calculator-large-screen cf">
-							<h2>Rp 105.050</h2>
-							<h2>Rp 110.000</h2>
+							<h2>{{getPaidAmount(order) | currency:"Rp "}}</h2>
+							<h2>{{getCashAmount(order) | currency:"Rp "}}</h2>
 						</div>
 						<div class="calculator-display-screen calculator-small-screen">
-							<h2>Rp 4.950</h2>
+							<h2>{{getReturnAmount(order) | currency:"Rp "}}</h2>
 						</div>
 					</div>
 				</div>
@@ -151,7 +151,7 @@
 			</div>
 			<div class="right-right-container" ng-show="show=='calculator'">
 				
-				<a class="btn-rounded btn-done" ng-click="pay()">Selesai</a>
+				<a class="btn-rounded btn-done" ng-click="payAll(orderItems)">Selesai</a>
 			</div>
 		</div>
   </ion-content>

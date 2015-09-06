@@ -1,0 +1,44 @@
+<ion-side-menus>
+
+  <div class="android-bar"></div>
+  <div class="top-bar">
+    <div class="bar-subheader page-heading">
+      <h1>{{outlet.name || "Bober Cafe"}}</h1>
+    </div>
+    <div class="account-tab" ng-if="isLogin">
+      <p>Welcome, {{user.name || "user"}}, <a ng-click="logout()">Logout</a></p>
+    </div>
+    <div class="account-tab" ng-if="!isLogin">
+      <p>Please Login</p>
+    </div>
+  </div>
+
+  <div class="card" ng-if="message">
+    <div class="item item-text-wrap">
+      {{message}}
+    </div>
+  </div>
+
+  <div has-header="true" padding="true" ng-if="!isLogin">
+    <form class="list">
+      <label class="item item-input">
+        <input type="text" placeholder="Username" ng-model="user.username" required>
+      </label>
+      <label class="item item-input">
+        <input type="password" placeholder="Password" ng-model="user.password" required>
+      </label>
+      <div class="padding">
+        <button class="button button-block button-stable" ng-click="login()">Login</button>
+      </div>
+    </form>
+  </div>
+
+  <div  ng-if="isLogin">
+    <ion-nav-view name="menuContent" animation="slide-left-right"></ion-nav-view>
+  </div>
+   
+</ion-side-menus>
+
+<div class="bar bar-footer android-onscreen-buttons-bar">
+  <div class="title"></div>
+</div>

@@ -1,6 +1,11 @@
-angular.module('erestoCashier', ['ionic', 'ngResource', 'erestoCashier.services', 'erestoCashier.controllers'])
+angular.module('erestoCashier', [
+  'ionic',
+  'erestoCashier.services', 
+  'erestoCashier.controllers',
+  'erestoCashier.config'
+])
 
-.run(function($ionicPlatform) {
+.run(function($rootScope, $ionicPlatform, localStorageService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -10,36 +15,56 @@ angular.module('erestoCashier', ['ionic', 'ngResource', 'erestoCashier.services'
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
-    $ionicModal.fromTemplateUrl('templates/login.html', function(modal) {
-        $scope.loginModal = modal;
-      },
-      {
-        scope: $scope,
-        animation: 'slide-in-up',
-        focusFirstInput: true
-      }
-    );
-  //Be sure to cleanup the modal by removing it from the DOM
-    $scope.$on('$destroy', function() {
-      $scope.loginModal.remove();
-    });
   });
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
 
   $stateProvider
-    .state('home', {
-      url: "/home",
-      templateUrl: "templates/home.html",
-      controller: 'HomeCtrl'
+    .state('app', {
+      url: "/app",
+      abstract: true,
+      templateUrl: "templates/menu.html",
+      controller: 'AppCtrl'
     })
-    .state('order', {
+    .state('app.table', {
+      url: "/table",
+      views: {
+        'menuContent' :{
+          controller:  "TableCtrl",
+          templateUrl: "templates/table.html"              
+        }
+      }
+    })      
+    .state('app.order', {
       url: "/order/:id",
-      templateUrl: "templates/order.html",
-      controller: 'OrderCtrl'
+      cache: false,
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/order.html",
+          controller: 'OrderCtrl'
+        }
+      }
+    })
+    .state('app.login', {
+      url: "/login",
+      views: {
+        'menuContent' :{
+          controller:  "LoginCtrl",
+          templateUrl: "templates/login.html"              
+        }
+      }
+    })    
+    .state('app.logout', {
+      url: "/logout",
+      views: {
+         'menuContent' :{
+           controller: "LogoutCtrl",
+           templateUrl: "templates/table.html"
+         }
+      } 
     });
 
-   $urlRouterProvider.otherwise("/home");
+   $urlRouterProvider.otherwise("/app/table");
 
 });

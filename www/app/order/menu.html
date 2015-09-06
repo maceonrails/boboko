@@ -1,0 +1,30 @@
+<div class="choose-menu-header-container cf">
+	<h1 class="choose-menu-header">Pilih Menu</h1>
+	<a ng-click="hideMenu()" class="btn-close"></a>
+</div>
+<div class="choose-menu-body-container">
+	<div class="menu-category-selector">
+		<div class="menu-category-main">
+			<h2 class="category-level">Category</h2>
+			<div class="menu-category-outer-container cf">
+				<div class="menu-category-inner-container">
+					<a class="menu-category-item" ng-repeat="category in categories" ng-click="showSubCategories(category)" ng-class="{active: activeCat == category.id}">{{category.name}}</a>
+				</div>
+			</div>
+		</div>
+		<div class="menu-category-sub" ng-show="activeCat">
+			<h2 class="category-level">Sub-Category</h2>
+			<div class="menu-category-outer-container cf">
+				<div class="menu-category-inner-container">
+					<a ng-repeat="subCategory in subCategories" ng-click="showProducts(subCategory)" class="menu-category-item" ng-class="{active: activeSubCat == subCategory.id}">{{subCategory.name}}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="menu-catalogue-container cf" ng-show="activeSubCat">
+		<div class="menu-catalogue-item pull-left" ng-repeat="product in products" ng-click="addMenu(product, order)">
+			<img ng-src="{{product.picture}}" alt="" class="menu-catalogue-picture">
+			<h2 class="menu-thumb-title">{{product.name}}</h2>
+		</div>
+	</div>
+</div>

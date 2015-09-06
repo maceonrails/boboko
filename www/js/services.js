@@ -1,212 +1,218 @@
-var resource_url = "http://localhost:3000";
+angular
+  .module('erestoCashier.services', ['http-auth-interceptor', 'restangular', 'LocalStorageModule'])
+  .factory('RestService', RestService)
+  .factory('AuthenticationService', AuthenticationService)
+  .factory('TableService', TableService)
+  .factory('OrderService', OrderService)
+  .factory('OrderItemService', OrderItemService)
+  .factory('CategoryService', CategoryService)
+  .factory('DiscountService', DiscountService)
+  .factory('TaxService', TaxService)
 
-angular.module('erestoCashier.services', ['http-auth-interceptor'])
-.factory('AuthenticationService', function($rootScope, $http, authService, $httpBackend) {
-  var service = {
-    login: function(user) {
-      $http.post('https://login', { user: user }, { ignoreAuthModule: true })
-      .success(function (data, status, headers, config) {
-      $http.defaults.headers.common.Authorization = data.authorizationToken;  // Step 1
-        // Store the token in SharedPreferences for Android, and Keychain for iOS
-        // localStorage is not very secure
+
+
+function AuthenticationService($rootScope, $http, authService, localStorageService, RestService) {
+  return {
+    login: login,
+    logout: logout,
+    loginCancelled: loginCancelled
+  }
+
+  function login(user) {
+    RestService.all('sessions').post({ user: user }).then(function (data) {
+      // $http.defaults.headers.common.Authorization = data.token;  // Step 1
+      // A more secure approach would be to store the token in SharedPreferences for Android, and Keychain for iOS
+      localStorageService.set('token', data.token);
         
-        // Need to inform the http-auth-interceptor that
+      // Need to inform the http-auth-interceptor that
         // the user has logged in successfully.  To do this, we pass in a function that
         // will configure the request headers with the authorization token so
         // previously failed requests(aka with status == 401) will be resent with the
         // authorization token placed in the header
         authService.loginConfirmed(data, function(config) {  // Step 2 & 3
-          config.headers.Authorization = data.authorizationToken;
+          config.headers.Authorization = data.token;
           return config;
         });
+    }, function (data) {
+      $rootScope.$broadcast('event:auth-login-failed', data.status);
+    });
+  }
+
+  function logout(user) {
+    RestService.all('sessions').post()
+    .finally(function(data) {
+      localStorageService.remove('token');
+      delete $http.defaults.headers.common.Authorization;
+      $rootScope.$broadcast('event:auth-logout-complete');
+    });     
+  }
+
+  function loginCancelled() {
+    authService.loginCancelled();
+  }
+}
+
+function TableService(RestService){
+  var base = RestService.all('tables');
+  return {
+    getAll: getAll,
+  }
+
+  function getAll() {
+    return base.getList().then(function (tables) {
+      return tables;
+    })
+  }
+}
+
+function UserService(RestService){
+  return RestService.service('users')
+}
+
+function OrderService(RestService, Tax){
+  var base = RestService.all('orders');
+  return {
+    getWaitingOrders: getWaitingOrders,
+    create: create,
+    find: find,
+    getSubTotal: getSubTotal
+    createOrderItems: createOrderItems
+  }
+
+  function getWaitingOrders () {
+    return base.getList({waiting: true}).then(function (orders) {
+      return orders;
+    })
+  }
+
+  function create(order) {
+    return base.post({order: order}).then(function (order) {
+      return order;
+    });
+  }
+
+  function find(id) {
+    return base.get(id).then(function (order) {
+      return order;
+    }, function (error) {
+      return error;
+    });
+  }
+
+  function getSubTotal (orderItems) {
+    var subTotal = 0
+    orderItems.forEach(function(orderItem) {
+      subTotal += orderItem.quantity * orderItem.product.price;
+    })
+    return subTotal
+  }
+
+  function getTotal (orderItems) {
+    getSubTotal(orderItems) + TaxService.
+  }
+
+  function createOrderItems (orderItems) {
+    orderItems.forEach(function (orderItem) {
+      base.post('order_items', orderItem).then(function (orderItem) {
+        return OrderItem;
       })
-      .error(function (data, status, headers, config) {
-        $rootScope.$broadcast('event:auth-login-failed', status);
-      });
-    },
-    logout: function(user) {
-      $http.post('https://logout', {}, { ignoreAuthModule: true })
-      .finally(function(data) {
-        delete $http.defaults.headers.common.Authorization;
-        $rootScope.$broadcast('event:auth-logout-complete');
-      });     
-    },  
-    loginCancelled: function() {
-      authService.loginCancelled();
-    }
+    })
+  }
+}
+
+function OrderItemService(RestService){
+  var base = RestService.all('order_items');
+  return {
+    getAllByOrder: getAllByOrder,
+    create: create,
+    bulkCreate: bulkCreate,
+    find: find
+  }
+
+  function getAllByOrder (order) {
+    return base.getList({order_id: order.id}).then(function (orderItems) {
+      return orderItems;
+    })
+  }
+
+  function create (orderItem) {
+    return base.post({order_item: orderItem}).then(function (orderItem) {
+      return OrderItem;
+    })
+  }
+
+  function bulkCreate (orderItems) {
+    orderItems.forEach(function (orderItem) {
+      create(orderItem);
+    })
+  }
+
+  function find(id) {
+    return base.get(id).then(function (orderItem) {
+      return orderItem;
+    }, function (error) {
+      return error;
+    });
+  }
+}
+
+function PaymentService(RestService){
+  return RestService.service('payments')
+}
+
+function CategoryService(RestService){
+  var base = RestService.all('product_categories')
+  return {
+    getAll: getAll
+  }
+
+  function getAll () {
+    return base.getList().then(function (categories) {
+      return categories;
+    })
+  }
+}
+
+function SubCategoryService(RestService){
+  return RestService.service('product_sub_categories')
+}
+
+function ProductService(RestService){
+  return RestService.service('products')
+}
+
+function DiscountService(RestService){
+  return RestService.service('discounts')
+}
+
+function TaxService(){
+  var taxes = {
+    'ppn': 0.1,
+    'service': 0.1
   };
-  return service;
-})
 
-.factory("Menu", function($resource) {
-  return $resource(resource_url + "/categories/:category_id/sub_categories/:sub_category_id/menus/:id.json", 
-  	{ 
-  		id: "@id", 
-  		category_id: "@sub_category.category_id", 
-  		sub_category_id: "@sub_category_id" 
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
+  return {
+    getTotalRate: getTotalRate,
+    taxes: taxes,
+    changeTaxes: changeTaxes,
+    calculateTax: calculateTax
+  }
+
+  function getTotalRate () {
+    var sum = 0;
+    for(var tax in taxes) {
+      sum += taxes[tax];
     }
-  );
-})
+    return sum;
+  }
 
-.factory("SubCategory", function($resource) {
-  return $resource(resource_url + "/sub_categories/:id.json", 
-  	{ 
-  		id: "@id", 
-  		category_id: "@category_id"
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
+  function changeTaxes (new_taxes) {
+    for (var i in new_taxes) {
+      taxes[i] = new_taxes[i];
     }
-  );
-})
+  }
 
-.factory("Category", function($resource) {
-  return $resource(resource_url + "/categories/:id.json", 
-  	{ 
-  		id: "@id"
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
-    }
-  );
-})
-
-.factory("Choice", function($resource) {
-  return $resource(resource_url + "/menus/:menu_id/choices/:id.json", 
-  	{ 
-  		id: "@id",
-  		menu_id: "@menu_id"
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
-    }
-  );
-})
-
-.factory("Table", function($resource) {
-  return $resource(resource_url + "/rooms/:room_id/tables/:id.json", 
-  	{ 
-  		id: "@id",
-  		rooms: "@room_id" 
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
-    }
-  );
-})
-
-.factory("Room", function($resource) {
-  return $resource(resource_url + "/rooms/:id.json", 
-  	{ 
-  		id: "@id"
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
-    }
-  );
-})
-
-.factory("Order", function($resource) {
-  return $resource(resource_url + "/orders/:id.json", 
-  	{ 
-  		id: "@id"
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
-    }
-  );
-})
-
-.factory("OrderItem", function($resource) {
-  return $resource(resource_url + "/orders/:order_id/order_items/:id.json", 
-  	{ 
-  		id: "@id",
-  		order_id: "@order_id"
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
-    }
-  );
-})
-
-.factory("Payment", function($resource) {
-  return $resource(resource_url + "/orders/:order_id/payments/:id.json", 
-  	{ 
-  		id: "@id",
-  		order_id: "@order_id"
-  	},
-    {
-      'create':  { method: 'POST' },
-      'index':   { method: 'GET', isArray: true },
-      'show':    { method: 'GET', isArray: false },
-      'update':  { method: 'PUT' },
-      'destroy': { method: 'DELETE' }
-    }
-  );
-})
-
-.service('OrderService', ['Order', function(Order){
-	var uid = 1;
-	var orders = Order.index();
-
-	this.new = function (order) {
-		order = typeof order !== 'undefined' ? order : {};
-		order.id = uid++;
-		order.status = 'waiting';
-		orders.push(order);
-	};
-
-	this.create = function (order) {
-		return Order.create(order)
-	};
-
-	this.get = function (id) {
-		for (i in orders) {
-			if (orders[i].id == id) return orders[i];
-		}
-	}
-
-	this.WaitingList = function () {
-	}
-
-}])
-
-.service('OrderItemService', ['Order', function(Order){
-	var uid = 0;
-}])
-
+  function calculateTax (subTotal) {
+    return getTotalRate() * subTotal
+  }
+}

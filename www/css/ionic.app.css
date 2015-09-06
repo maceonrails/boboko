@@ -7745,6 +7745,15 @@ div.android-onscreen-buttons-bar {
   height: 48px;
   background-color: black; }
 
+h2 {
+  margin-top: 0px; }
+
+h2 + h2, h2 + h3 {
+  margin-top: 0px; }
+
+.popup-container .popup {
+  width: 370px; }
+
 .cf:before, .cf:after {
   content: "";
   display: table; }
@@ -7945,7 +7954,9 @@ a.btn-add-queue {
     /* Standard syntax */ }
 
 ul.take-away-queue-container {
-  padding: 1px 5px; }
+  padding: 1px 5px;
+  overflow: auto;
+  height: 90%; }
   ul.take-away-queue-container li {
     font-size: 18px;
     font-family: Lato, sans-serif;
@@ -8164,7 +8175,7 @@ div.calculator-container {
   height: 100%;
   margin-left: 26px;
   float: left;
-  width: 480px; }
+  width: 592px; }
 
 div.calculator-displays-container {
   margin-bottom: 4px; }
@@ -8212,28 +8223,35 @@ div.calculator-display-screen {
   margin-right: 4px; }
   div.calculator-display-screen:last-child {
     margin-right: 0; }
+  div.calculator-display-screen div {
+    overflow-x: auto;
+    white-space: nowrap; }
+    div.calculator-display-screen div:first-child {
+      float: left; }
+    div.calculator-display-screen div:last-child {
+      float: right; }
   div.calculator-display-screen h2 {
     font-size: 23px;
     font-weight: bold;
     line-height: 59px;
     padding: 5px; }
-    div.calculator-display-screen h2:first-child {
-      float: left; }
-    div.calculator-display-screen h2:last-child {
-      float: right; }
 
 div.calculator-large-screen {
   width: 325px; }
+  div.calculator-large-screen div {
+    width: 152px; }
 
 div.calculator-small-screen {
   width: 141px; }
+  div.calculator-small-screen div {
+    width: 120px; }
 
 .btn-corner-rounded {
   position: relative;
   display: inline-block;
   float: left;
-  width: 96px;
-  height: 102px;
+  width: 110px;
+  height: 116px;
   padding: 7px;
   border-radius: 5px;
   text-align: center;
@@ -8288,7 +8306,7 @@ div.calculator-small-screen {
 
 div.right-right-container {
   width: 110px;
-  height: 100%;
+  height: 20%;
   float: right;
   margin: 0;
   position: relative; }
@@ -8299,8 +8317,8 @@ a.btn-done {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 81px;
-  height: 81px;
+  width: 95px;
+  height: 95px;
   color: white;
   font-size: 21px;
   line-height: 79px;
@@ -8382,6 +8400,7 @@ div.menu-catalogue-item {
   margin: 10px;
   width: 129px;
   overflow: hidden;
+  min-height: 182px;
   text-align: center; }
 
 h2.menu-thumb-title {
