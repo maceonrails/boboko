@@ -530,6 +530,11 @@ a.btn-transaction-pembayaran:after {
 	font-size: 27px;
 }
 
+a.btn-transaction-cancel:after {
+	content: "Back";
+	font-size: 21px;
+}
+
 
 
 div.right-container {
@@ -538,7 +543,7 @@ div.right-container {
 
 	float: right;
 	border-left: 2px solid $primary-color;
-	padding-top: 30px;
+	padding-top: 6px;
 	padding-bottom: 20px;
 	// padding-left: 36px;
 	padding-left: 10px;
@@ -559,6 +564,7 @@ div.calculator-container {
 	// width: 504px;
 	// width: 464px;
 	width: 592px;
+	padding-top: 25px;
 
 }
 
