@@ -10,33 +10,41 @@ function OrderService(RestService, TaxService, $q){
     find: find,
     getSubTotal: getSubTotal,
     createOrderItems: createOrderItems,
-    getOrderItems: getOrderItems,
+    getActiveItems: getActiveItems,
     payAll: payAll,
     saveOrder: saveOrder,
     getTotal: getTotal,
     getPaidAmount: getPaidAmount, 
     getReturnAmount: getReturnAmount,
-    addMenu: addMenu
+    addMenu: addMenu, 
+    moveFromSplit: moveFromSplit,
+    moveToSplit: moveToSplit,
+    cancelSplit: cancelSplit
   }
 
   function addMenu (product, order) {
     var orderItem = RestService.one('order_items');
-    orderItem.quantity = 1;
     orderItem.product_id = product.id;
     orderItem.order_id = order.id;
-    orderItem.product = product;
+    orderItem.price = product.price;
+    orderItem.name = product.name;
+    orderItem.picture = product.picture;
+    orderItem.quantity = 1;
+    orderItem.pay_quantity = 0;
+    orderItem.paid_quantity = 0;
+    orderItem.printed_quantity = 0;
     orderItem.paid_amount = orderItem.quantity * product.price;
     var sameItem = false;
 
-    order.orderItems.forEach(function (orderItem) {
-      if (orderItem.product.id === product.id) {
+    order.order_items.forEach(function (orderItem) {
+      if (orderItem.product_id === product.id) {
         sameItem = true;
         orderItem.quantity++;
       } 
     })
 
-    if (order.orderItems.length === 0 || !sameItem) {
-      order.orderItems.push(orderItem);
+    if (order.order_items.length === 0 || !sameItem) {
+      order.order_items.push(orderItem);
     }
 
     orderItem.sub_total = (orderItem.quantity * product.price);
@@ -46,43 +54,104 @@ function OrderService(RestService, TaxService, $q){
     return order;
   }
 
+  function moveToSplit (item, order, split_order) {
+    var sameItem = false
+    split_order.order_items.forEach(function (orderItem) {
+      if (orderItem === item) {
+        item.pay_quantity++
+        item.quantity--
+        if (item.quantity == 0) {
+          _.remove(order.order_items, {
+            product_id: item.product_id
+          });
+        }
+        sameItem = true
+      } 
+    })
+    if (!sameItem) {
+      item.quantity--
+      item.pay_quantity++
+      split_order.order_items.push(item)
+      console.log('move to split', item)
+      if (item.quantity == 0) {
+        _.remove(order.order_items, {
+          product_id: item.product_id
+        });
+      }
+    }
+  }
+
+  function moveFromSplit (item, split_order, order) {
+    var sameItem = false
+    order.order_items.forEach(function (orderItem) {
+      if (orderItem === item) {
+        item.pay_quantity--
+        item.quantity++
+        console.log('move to split same item', item)
+        if (item.pay_quantity == 0) {
+          _.remove(split_order.order_items, {
+            product_id: item.product_id
+          });
+        }
+        sameItem = true
+      } 
+    })
+    if (!sameItem) {
+      item.quantity++
+      item.pay_quantity--
+      order.order_items.push(item)
+      console.log('move from split', item)
+      if (item.pay_quantity == 0) {
+        _.remove(split_order.order_items, {
+          product_id: item.product_id
+        });
+      }
+    }
+  }
+
+  function cancelSplit (order, split_order) {
+    var sameItem = false
+    split_order.order_items.forEach(function (splitItem) {
+      order.order_items.forEach(function (orderItem) {
+        if (splitItem === orderItem) {
+          orderItem.quantity += orderItem.pay_quantity
+          orderItem.pay_quantity = 0
+          sameItem = true
+        }
+      })
+      if (!sameItem) {
+        splitItem.quantity += splitItem.pay_quantity
+        order.order_items.push(splitItem)
+      }
+    })
+    split_order.order_items = [];
+  }
+
+  function moveItem (item, fromOrder, toOrder) {
+
+  }
+
   function changeItem (order) {
     // body...
   }
 
   function saveOrder (order) {
-    return $q( function(resolve, reject) {
-      order.orderItems.forEach(function (orderItem) {
-        if (!orderItem.id) {
-          var promise = order.post('order_items', {order_item: orderItem});
-        } else {
-          var promise = RestService.one('order_items', orderItem.id).customPUT({order_item: orderItem});
-        }
-        
-        promise.then(function (res) {
-          console.log(res);
-          resolve(order);
-        }, function (res) {
-          console.log(res);
-          reject(order);
-        });
-      })
-    })
+    return order.post("make_order", order)
   }
 
-  function calculate (order, discountAmount) {
-    var subTotal = getSubTotal(order)
-    var taxTotal = TaxService.calculateTax(subTotal)
-    var total = subTotal + taxTotal
-    var paidAmount = total - discountAmount
-    var ppnTax = TaxService.getPpnTax(subTotal)
-    var serviceTax = TaxService.getServiceTax(subTotal)
+  function calculate (order, discount_amount) {
+    var sub_total = getSubTotal(order)
+    var tax_amount = TaxService.calculateTax(sub_total)
+    var total = sub_total + tax_amount
+    var paid_amount = total - discount_amount
+    var ppnTax = TaxService.getPpnTax(sub_total)
+    var serviceTax = TaxService.getServiceTax(sub_total)
 
     return {
-      subTotal: subTotal,
-      taxTotal: taxTotal,
+      sub_total: sub_total,
+      tax_amount: tax_amount,
       total: total,
-      paidAmount: paidAmount,
+      paid_amount: paid_amount,
       taxes: {
         'ppn': ppnTax,
         'service': serviceTax
@@ -91,21 +160,34 @@ function OrderService(RestService, TaxService, $q){
   }
 
   function getSubTotal (order) {
-    var subTotal = 0
-    order.orderItems.forEach(function(orderItem) {
-      subTotal += getItemSubTotal(orderItem)
+    var sub_total = 0
+    order.order_items.forEach(function(orderItem) {
+      if (orderItem.product_id)
+        if (order.type === 'split')
+          sub_total += orderItem.pay_quantity * orderItem.price;
+        else if (order.type === 'void')
+          sub_total += orderItem.void_quantity * orderItem.price;
+        else
+          sub_total += orderItem.quantity * orderItem.price;
+      else
+        sub_total += 0;
     })
-    return subTotal;
+    return sub_total;
   }
 
-  function getItemSubTotal (orderItem) {
-    if (orderItem.product)
-      return orderItem.quantity * orderItem.product.price;
+  function getItemSubTotal (order, orderItem) {
+    if (orderItem.product_id)
+      if (order.type === 'split')
+        return orderItem.pay_quantity * orderItem.price;
+      else if (order.type === 'void')
+        return orderItem.void_quantity * orderItem.price;
+      else
+        return orderItem.quantity * orderItem.price;
     else
       return 0;
   }
 
-  function getTaxTotal (order) {
+  function getTaxAmount (order) {
     return TaxService.calculateTax(getSubTotal(order));
   }
 
@@ -120,20 +202,20 @@ function OrderService(RestService, TaxService, $q){
   }
 
   function getTotal (order) {
-    return getSubTotal(order) + getTaxTotal(order);
+    return getSubTotal(order) + getTaxAmount(order);
   }
 
   function getPaidAmount (order) {
-    return getTotal(order) + order.discountAmount;
+    return getTotal(order) + order.discount_amount;
   }
 
   function getReturnAmount (order) {
-    paidAmount = getPaidAmount(order)
-    return paidAmount > order.cashAmount ? 0 : order.cashAmount - paidAmount;
+    paid_amount = getPaidAmount(order)
+    return paid_amount > order.cash_amount ? 0 : order.cash_amount - paid_amount;
   }
 
   function getWaitingOrders () {
-    return base.getList({waiting: true}).then(function (orders) {
+    return base.customGET("waiting_orders").then(function (orders) {
       return orders;
     })
   }
@@ -151,22 +233,22 @@ function OrderService(RestService, TaxService, $q){
   }
 
 
-  function createOrderItems (orderItems) {
-    orderItems.forEach(function (orderItem) {
+  function createOrderItems (order_items) {
+    order_items.forEach(function (orderItem) {
       base.post('order_items', orderItem).then(function (orderItem) {
         return OrderItem;
       })
     })
   }
 
-  function getOrderItems (order) {
-    return order.getList('order_items', {paid: false}).then(function (orderItems) {
-      return orderItems;
+  function getActiveItems (order) {
+    return order.customGET('order_items/active_items').then(function (order_items) {
+      return order_items;
     })
   }
 
-  function payAll (order, orderItems) {
-    return order.customPOST({order_id: order.id, order_items: orderItems}, "pay", {}, {}).then(function (result) {
+  function payAll (order, order_items) {
+    return order.customPOST({order_id: order.id, order_items: order_items}, "pay", {}, {}).then(function (result) {
       return order;
     }, function (error) {
       return error;

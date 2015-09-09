@@ -1,197 +1,74 @@
 angular
-	.module('eresto.order', ['eresto.authentication.service'])
+	.module('eresto.order', [])
 	.controller('OrderCtrl', OrderCtrl)
 
-function OrderCtrl($scope, $stateParams, $state, PaymentService, OrderService, MenuService, TaxService, DiscountService, $ionicPopup, RestService, AuthenticationService){
+function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ionicPopup){
 	$scope.showMenu = showMenu;
 	$scope.hideMenu = hideMenu;
 	$scope.showCalculator = showCalculator;
 	$scope.showSplit = showSplit;
-	$scope.addMenu = addMenu;
-	$scope.removeMenu = removeMenu;
-	$scope.showItemPopup = showItemPopup;
-	$scope.showSubCategories = showSubCategories;
-	$scope.showProducts = showProducts;
-	$scope.payAll = payAll;
-	$scope.paySplit = paySplit;
 	$scope.voidOrder = voidOrder;
-	$scope.showItemDetail = showItemDetail;
 	$scope.saveOrder = saveOrder;
-
-	$scope.getSubTotal = getSubTotal;
-	$scope.getTaxTotal = getTaxTotal;
-	$scope.getReturnAmount = getReturnAmount;
-	$scope.getTotal = getTotal;
-	$scope.getPaidAmount = getPaidAmount;
-	$scope.getTax = getTax;
+	$scope.cancelSplit = cancelSplit;
 
 	// Discount
 	$scope.addPercentDiscount = addPercentDiscount;
-	$scope.addAmountDiscount = addAmountDiscount;
+	$scope.addDiscountAmount = addDiscountAmount;
 
 	// calculator function, will create directive for this
-	$scope.calcAddDigit = calcAddDigit;
-	$scope.calcAddMoney = calcAddMoney;
-	$scope.calcClear = calcClear;
-	$scope.calcDelete = calcDelete;
 
 	init();
 
 	function init() {
-		$scope.splitOrder = {};
+		$rootScope.show = ''
+		$scope.split_order = {};
 		$scope.order = {}
-		$scope.order.orderItems = []
-		$scope.splitOrder.orderItems = []
-		$scope.splitOrder.name = 'Split'
+		$scope.order.order_items = []
+		$scope.split_order.order_items = []
+		$scope.split_order.type = 'split'
+		$scope.split_order.id = $stateParams.id
+		$scope.split_order.discount_amount = 0
+		$scope.split_order.cash_amount = 0
 		OrderService.find($stateParams.id).then(function (order) {
-			$scope.order = order;
-			$scope.order.discountAmount = 0;
-			$scope.order.cashAmount = 0;
-			OrderService.getOrderItems(order, {paid: false, void: false}).then(function (orderItems) {
-				$scope.order.orderItems = orderItems;
-			})
+			$scope.order = order
+			$scope.order.discount_amount = 0
+			$scope.order.cash_amount = 0
+
+			$scope.split_order.id = order.id
+			$scope.split_order.name = order.name
+			$scope.split_order.table_id = order.table_id
+			$scope.split_order.waiting = order.waiting
+			$scope.split_order.servant_id = order.servant_id
 		});
-		MenuService.getCategories().then(function (categories) {
-			$scope.categories = categories;
-		});
 	}
 
-	function getSubTotal(order) {
-		return OrderService.getSubTotal(order);
-	}
-
-	function getTaxTotal(order) {
-		return OrderService.getTaxTotal(order);
-	}
-
-	function getTotal(order) {
-		return OrderService.getTotal(order);
-	}
-
-	function getPaidAmount(order) {
-		return OrderService.getPaidAmount(order);
-	}
-
-	function getTax(tax, order) {
-		return TaxService.getTax(tax) * OrderService.getSubTotal(order);
-	}
-
-	function getReturnAmount (order) {
-		return OrderService.getReturnAmount(order)
-	}
 
 	function showMenu() {
-		$scope.show = 'menu';
+		$rootScope.show = 'menu';
 	};
 
 	function hideMenu() {
-		$scope.show = '';
+		$rootScope.show = '';
 	};
 
-	function showCalculator() {
-		$scope.show = 'calculator';
+	function showCalculator(order) {
+		if (order.type == "split") {
+			$rootScope.show = 'splitCalculator'
+		} else {
+			$rootScope.show = 'orderCalculator'
+		}
 	};
 
 	function showSplit() {
-		$scope.show = 'split';
+		$rootScope.show = 'split';
 	};
 
-	function addMenu(product, order) {
-		$scope.order = OrderService.addMenu(product, order);
-	};
-
-	function changeItem (argument) {
-		// body...
+	function cancelSplit (order, split_order) {
+		OrderService.cancelSplit(order, split_order)
+		$rootScope.show = 'calculator'
 	}
 
-	function removeMenu(index) {
-		$scope.order.orderItems.splice(index, 1);
-	};
-
-	function showItemPopup(index) {
-	};
-
-	function showSubCategories(category) {
-   	$scope.subCategories = category.getList('product_sub_categories').$object;
-		$scope.activeCat = category.id;
-		$scope.activeSubCat = null;
-	};
-
-	function showProducts(subCategory) {
-		$scope.products = subCategory.getList('products').$object;
-		$scope.activeSubCat = subCategory.id;
-	};
-
-	function calcAddDigit (digit) {
-		$scope.order.cashAmount = parseInt($scope.order.cashAmount.toString() + digit);
-	}
-
-	function calcAddMoney (cash) {
-		$scope.order.cashAmount += cash;
-	}
-
-	function calcClear() {
-		$scope.order.cashAmount = 0;
-	}
-
-	function calcDelete () {
-		if ($scope.order.cashAmount > 9) {
-			$scope.order.cashAmount = parseInt($scope.order.cashAmount.toString().slice(0, -1));
-		} else {
-			calcClear();
-		}
-	}
-
- 	function payAll(order, orderItems) {
- 		if (getPaidAmount(order) > order.cashAmount) {
- 			$ionicPopup.alert({
-				title: 'Kesalahan',
-				template: 'Pembayaran tidak cukup atau tidak ada menu yang di pilih.'
-			}).then(function (res) {
- 				console.log(res);
- 			})
- 		} else {
- 			PaymentService.payOrder(order, orderItems).then(function (order) {
- 				$ionicPopup.alert({
-					title: 'Pembayaran berhasil',
-					scope: $scope,
-					template: '<center>Kembali:<br><br> <b>{{getReturnAmount(order) | currency: "Rp "}}</b> </center>'
-				}).then(function (res) {
-	 				console.log(res);
-	 				$state.go('auth.dashboard');
-	 			})
- 			}, function (order) {
-	 			$ionicPopup.alert({
-				  title: 'Kesalahan',
-				  template: 'Pembayaran gagal, silahkan ulangi.'
-				}).then(function(res) {	 
-	 				console.log(res);
-	 			})
-	 		})
- 		}
- 	}
-
- 	function paySplit (splitOrder) {
- 		if ($scope.shouldPaid > $scope.paidAmount && $scope.shouldPaid !== 0) {
- 			notAllowedPopup.then(function (res) {
- 				console.log(res);
- 			})
- 		} else {
- 			PaymentService.paySplit(splitOrder).then(function (payment) {
-	 			successPopup.then(function (res) {
-	 				console.log(res, payment);
-	 				$state.go('auth.dashboard');
-	 			})
-	 		}, function (error) {
-	 			failedPopup.then(function(res) {	 
-	 				console.log(res, error);
-	 			})
-	 		})
- 		}
- 		
- 	}
-
- 	function addAmountDiscount () {
+ 	function addDiscountAmount () {
  		$scope.discount = {};
 	 	var discountPopup = $ionicPopup.show({
 	   	templateUrl: 'app/order/discount-form.html',
@@ -207,7 +84,7 @@ function OrderCtrl($scope, $stateParams, $state, PaymentService, OrderService, M
 	         	if (!$scope.discount.amount) {
 	           	e.preventDefault();
 	         	} else {
-	         		$scope.amountDiscount = $scope.discount.amount;
+	         		$scope.discount_amount = $scope.discount.amount;
 	         	}
 	       	}
 	     	},
@@ -233,17 +110,17 @@ function OrderCtrl($scope, $stateParams, $state, PaymentService, OrderService, M
 	         	if (!$scope.discount.amount) {
 	           	e.preventDefault();
 	         	} else {
-							$scope.amountDiscount = ($scope.discount.amount / 100) * $scope.subTotal;
+							$scope.discount_amount = ($scope.discount.amount / 100) * $scope.sub_total;
 	         	}
 	       	}
 	     	},
 	   	]
 	 	});
-	 	percentPopup.then(function(amountDiscount) {	 
+	 	percentPopup.then(function(discount_amount) {	 
 	 	});
  	}
 
- 	function voidOrder (order, orderItems) {
+ 	function voidOrder (order, order_items) {
  		$scope.void = {};
 	 	var myPopup = $ionicPopup.show({
 	   	templateUrl: 'app/order/void-form.html',
@@ -257,7 +134,7 @@ function OrderCtrl($scope, $stateParams, $state, PaymentService, OrderService, M
 	       	type: 'button-positive',
 	       	onTap: function(e) {
 	         	order.void_note = $scope.void.note;
-	         	PaymentService.payOrder(order, orderItems).then(function (res) {
+	         	PaymentService.payOrder(order, order_items).then(function (res) {
 			 				$ionicPopup.alert({
 								title: 'Void Sukses',
 								scope: $scope,
@@ -282,65 +159,8 @@ function OrderCtrl($scope, $stateParams, $state, PaymentService, OrderService, M
 	 	});
  	}
 
- 	function showItemDetail (orderItem) {
- 		var lastQuantity = orderItem.quantity;
- 		$scope.orderItem = orderItem;
-	 	var myPopup = $ionicPopup.show({
-	   	templateUrl: 'app/order/item-detail.html',
-	   	title: 'Order Item detail',
-	   	subTitle: 'Input quantity or write note',
-	   	scope: $scope,
-	   	buttons: [
-	     	{ text: 'Cancel' },
-	     	{
-	       	text: '<b>Set</b>',
-	       	type: 'button-positive',
-	       	onTap: function(e) {
-				 		if ($scope.orderItem.quantity < lastQuantity) {
-		 					if ($scope.orderItem.id) {
-				 				$ionicPopup.show({
-							   	template: '<input type="text" ng-model="user.email"><input type="password" ng-model="user.password">',
-							   	title: 'Need Verification',
-							   	subTitle: 'Please input email and password',
-							   	scope: $scope,
-							   	buttons: [
-							     	{ text: 'Cancel' },
-							     	{
-							       	text: '<b>Gift</b>',
-							       	type: 'button-positive',
-							       	onTap: function(e) {
-							         	if (!$scope.user.name || !$scope.name.pass) {
-							           	e.preventDefault();
-							         	} else {
-							         		AuthenticationService.authorizeUser($scope.user).then(function (res) {
-							         			$scope.orderItem.provider_id = res;
-							         			$scope.orderItem.void = true;
-							         			$scope.orderItem.void_note = $scope.void_note;
-							         			$scope.orderItem.void_quantity = $scope.void_quantity;
-							         		})
-							         	}
-							       	}
-							     	},
-							   	]
-							 	});
-				 			} else {
-				 				if ($scope.orderItem.quantity == 0) 
-					 				_.remove($scope.order.orderItems, {
-									  product_id: orderItem.product_id
-									});
-				 			}
-				 		}
-	       	}
-	     	},
-	   	]
-	 	});
-	 	myPopup.then(function(orderItem) {
-
-	 	});
- 	}
-
- 	function saveOrder (order, orderItems) {
- 		OrderService.save(order).then(function (res) {
+ 	function saveOrder (order, order_items) {
+ 		OrderService.saveOrder(order).then(function (res) {
 			$ionicPopup.alert({
 				title: 'Order sukses',
 				scope: $scope,

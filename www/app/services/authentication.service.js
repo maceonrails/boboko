@@ -2,7 +2,7 @@ angular
   .module('eresto.authentication.service', ['http-auth-interceptor', 'LocalStorageModule'])
   .factory('AuthenticationService', AuthenticationService)
 
-function AuthenticationService($rootScope, $http, authService, localStorageService, RestService) {
+function AuthenticationService($rootScope, $http, authService, localStorageService, RestService, UserService) {
   return {
     login: login,
     logout: logout,
@@ -10,20 +10,24 @@ function AuthenticationService($rootScope, $http, authService, localStorageServi
   }
 
   function login(user) {
+    $rootScope.current_user = null
     RestService.all('sessions').post({ user: user }).then(function (data) {
       // $http.defaults.headers.common.Authorization = data.token;  // Step 1
       // A more secure approach would be to store the token in SharedPreferences for Android, and Keychain for iOS
-      localStorageService.set('token', data.token);
-        
-      // Need to inform the http-auth-interceptor that
-        // the user has logged in successfully.  To do this, we pass in a function that
-        // will configure the request headers with the authorization token so
-        // previously failed requests(aka with status == 401) will be resent with the
-        // authorization token placed in the header
+      if (data.role == 'cashier') {
+
+        localStorageService.set('token', data.token);
+        UserService.one('users', data.id).get().then(function (user) {
+          $rootScope.currentUser = user 
+        })
         authService.loginConfirmed(data, function(config) {  // Step 2 & 3
           config.headers.Authorization = data.token;
           return config;
         });
+      } else {
+        $rootScope.$broadcast('event:auth-login-failed', "Maaf, akses ditolak.");
+      }
+        
     }, function (data) {
       $rootScope.$broadcast('event:auth-login-failed', data.status);
     });

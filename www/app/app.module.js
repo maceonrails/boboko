@@ -26,5 +26,4 @@ angular.module('eresto', [
     }
   });
 
-  localStorageService.set('company_id', 6969)
 });

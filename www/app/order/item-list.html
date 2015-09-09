@@ -1,8 +1,3 @@
-<a class="btn-add-order btn-disabled" ng-click="$parent.showMenu()"></a>
-<div class="order-table-properties">
-	<h2 class="order-table-number">Order</h2>
-	<h3 class="order-table-customer">{{order.name}}</h3>
-</div>
 <table class="order-list">
 	<thead>
 		<tr>
@@ -13,37 +8,39 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-click="showItemDetail(orderItem)" ng-repeat="orderItem in order.orderItems">
-			<td width="52%">{{orderItem.product.name}}</td>
-			<td width="8%">{{orderItem.quantity}}</td>
-			<td width="20%">{{orderItem.product.price | currency:"Rp "}}</td>
-			<td width="20%">{{orderItem.product.price * orderItem.quantity | currency:"Rp "}}</td>
+		<tr ng-click="clickItem(orderItem)" ng-repeat="orderItem in order.order_items">
+			<td width="52%">{{orderItem.name}}</td>
+			<td width="8%" ng-hide="order.type == 'split'">{{orderItem.quantity - orderItem.paid_quantity}}</td>
+			<td width="8%" ng-show="order.type == 'split'">{{orderItem.pay_quantity}}</td>
+			<td width="20%">{{orderItem.price | currency:"Rp "}}</td>
+			<td width="20%" ng-hide="order.type == 'split'">{{orderItem.price * orderItem.quantity | currency:"Rp "}}</td>
+			<td width="20%" ng-show="order.type == 'split'">{{orderItem.price * orderItem.pay_quantity | currency:"Rp "}}</td>
 		</tr>
 	</tbody>
 </table>
 <div class="order-counts cf">
 	<div class="order-count-item">
 		<p>Diskon</p>
-		<h2>{{order.discountAmount | currency:"Rp "}}</h2>
+		<h2>{{order.discount_amount | currency:"Rp ":0}}</h2>
 	</div>
 	<div class="order-count-item">
 		<p>Sub-Total</p>
-		<h2>{{getSubTotal(order) | currency:"Rp "}}</h2>
+		<h2>{{getSubTotal(order) | currency:"Rp ":0}}</h2>
 	</div>
 	<div class="order-count-item">
 		<p>PPN</p>
-		<h2>{{getTax('ppn', order) | currency:"Rp "}}</h2>
+		<h2>{{getTax('ppn', order) | currency:"Rp ":0}}</h2>
 	</div>
 	<div class="order-count-item">
 		<p>TOTAL</p>
-		<h2 class="order-total">{{getTotal(order) | currency:"Rp "}}</h2>
+		<h2 class="order-total">{{getTotal(order) | currency:"Rp ":0}}</h2>
 	</div>
 	<div class="order-count-item">
 		<p>Service</p>
-		<h2>{{getTax('service', order) | currency:"Rp "}}</h2>
+		<h2>{{getTax('service', order) | currency:"Rp ":0}}</h2>
 	</div>
 	<div class="order-count-item">
 		<p>Ditagihkan</p>
-		<h2 class="order-total-charge">{{getPaidAmount(order) | currency:"Rp "}}</h2>
+		<h2 class="order-total-charge">{{getPaidAmount(order) | currency:"Rp ":0}}</h2>
 	</div>
 </div>

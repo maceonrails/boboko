@@ -5,16 +5,19 @@ angular
 function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, RestService){
 	$scope.tables = []
 	$rootScope.orders = [];
+	$rootScope.init = init;
 
-	(function watchService() {
+	init();	
+
+  function init() {
     TableService.getAll().then(function (tables) {
 			$scope.tables = _.groupBy(tables, 'location');
 			OrderService.getWaitingOrders().then(function (orders) {
 				$rootScope.orders = orders;
-				$timeout(watchService, 10000)
+				$timeout(init, 10000)
 			})
 		})
-  })();	
+  }
 
 	$scope.addOrder = addOrder;
 	$scope.showOrder = showOrder;

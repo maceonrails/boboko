@@ -1,20 +1,20 @@
 angular
   .module('eresto.orderItem.service', ['eresto.rest.service', 'eresto.tax.service'])
-  .factory('OrderItemService', OrderItemService)
+  .factory('order_itemservice', order_itemservice)
 
-function OrderItemService(RestService, TaxService){
+function order_itemservice(RestService, TaxService){
   base = RestService.all('order_items')
 
   return {
 
   }
 
-  function subTotal (orderItem) {
+  function sub_total (orderItem) {
     return orderItem.product.price * orderItem.quantity
   }
 
   function total (orderItem) {
-    subTotal = subTotal(orderItem)
-    return subTotal + TaxService.calculateTax(subTotal)
+    sub_total = sub_total(orderItem)
+    return sub_total + TaxService.calculateTax(sub_total)
   }
 }

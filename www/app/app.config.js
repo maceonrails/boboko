@@ -48,7 +48,7 @@ angular.module('eresto.config', ['restangular', 'LocalStorageModule'])
       localStorageService.set('token', null);
       return $q.reject(rejection);// return to login page
     } else if (rejection.status === 404) {
-      $rootScope.$broadcast('host:show')
+      // $rootScope.$broadcast('host:show')
       return $q.reject(rejection);
     }
     else {

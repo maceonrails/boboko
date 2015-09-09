@@ -10,7 +10,7 @@
 				<h2>{{getPaidAmount(order) | currency:"Rp ":0}}</h2>
 			</div>
 			<div>
-				<h2>{{order.cashAmount | currency:"Rp ":0}}</h2>
+				<h2>{{order.cash_amount | currency:"Rp ":0}}</h2>
 			</div>
 		</div>
 		<div class="calculator-display-screen calculator-small-screen">
@@ -39,5 +39,5 @@
 	<a ng-click="calcDelete()" class="btn-corner-rounded btn-rounded-secondary">Del</a>
 </div>
 <div class="right-right-container">		
-	<a class="btn-rounded btn-done" ng-click="payAll(order, orderItems)">Done</a>
+	<a class="btn-rounded btn-done" ng-click="payAll(order, order_items)">Done</a>
 </div>

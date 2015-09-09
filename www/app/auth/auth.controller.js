@@ -25,7 +25,8 @@ function AuthCtrl($rootScope, $scope, $state, AuthenticationService, $ionicPopup
               e.preventDefault();
             } else {
               localStorageService.set('host', $scope.host.target);
-              $state.go('auth.dashboard', {}, {reload: true});
+              $rootScope.init();
+
             }
           }
         },

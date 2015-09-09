@@ -1,10 +1,17 @@
 <ion-view view-title="Title">
   <ion-content>
-  	<div class="left-container">
-			<div class="left-inner-container" item-list order="order"></div>
-			<ul class="transactional-buttons-container">
+  	<div class="left-container" ng-hide="show=='splitCalculator'">
+			<div class="left-inner-container">
+				<a class="btn-add-order btn-disabled" ng-click="showMenu()"></a>
+				<div class="order-table-properties">
+					<h2 class="order-table-number">Order</h2>
+					<h3 class="order-table-customer">{{order.name}}</h3>
+				</div>
+				<eresto-item-list order="order"> </eresto-item-list>
+			</div>
+			<ul class="transactional-buttons-container" ng-hide="show == 'split'">
 				<li>
-					<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, orderItems)"></a>
+					<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, order_items)"></a>
 					<p>Void</p>
 				</li>
 				<li>
@@ -12,7 +19,7 @@
 					<p>Bayar Pisah</p>
 				</li>
 				<li>
-					<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="addAmountDiscount()"></a>
+					<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="addDiscountAmount()"></a>
 					<p>Diskon Rp</p>
 				</li>
 				<li>
@@ -24,20 +31,51 @@
 					<p>Print</p>
 				</li>
 				<li>
-					<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator()"></a>
+					<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator(order)"></a>
 					<p>Pembayaran</p>
-
+				</li>
+			</ul>
+		</div>
+		<div class="left-container" ng-show="show=='splitCalculator'">
+			<div class="left-inner-container">
+				<div class="order-table-properties">
+					<h2 class="order-table-number">Split Order</h2>
+					<h3 class="order-table-customer">{{order.name}}</h3>
+				</div>
+				<eresto-item-list order="split_order"> </eresto-item-list>
+			</div>
+			<ul class="transactional-buttons-container">
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-cancel" href="#" ng-click="cancelSplit(order, split_order)"></a>
+					<p>Cancel</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator(split_order)"></a>
+					<p>Pembayaran</p>
 				</li>
 			</ul>
 		</div>
 		<div class="right-container cf">
-			<div class="choose-menu-container" ng-include="'app/order/menu.html'" scope="" onload="" ng-show="show=='menu'">
+			<div class="choose-menu-container" eresto-menu ng-show="show=='menu'"></div>
+			<div class="left-inner-container"  ng-show="show=='split'">
+				<div class="order-table-properties">
+					<h2 class="order-table-number">Split Order</h2>
+					<h3 class="order-table-customer">{{order.name}}</h3>
+				</div>
+				<eresto-item-list order="split_order"> </eresto-item-list>
 			</div>
-
-			<div class="left-inner-container" item-list order="splitOrder" ng-show="show=='split'"></div>
-
-			<div class="calculator-container" ng-include="'app/order/payment.html'" scope="" onload="" ng-show="show=='calculator'">
-			</div>
+			<ul class="transactional-buttons-container" ng-show="show=='split'">
+				<li>
+					<a class="btn-rounded btn-secondary btn-transaction-cancel" href="#" ng-click="cancelSplit(order, split_order)"></a>
+					<p>Cancel</p>
+				</li>
+				<li>
+					<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator(split_order)"></a>
+					<p>Pembayaran</p>
+				</li>
+			</ul>
+			<div class="calculator-container" eresto-payment order="order" ng-show="show=='orderCalculator'"></div>
+			<div class="calculator-container" eresto-payment order="split_order" ng-show="show=='splitCalculator'"></div>
 		</div>
   </ion-content>
 </ion-view>

@@ -12,9 +12,9 @@ function DiscountService (RestService) {
 		
 	}
 
-	// function calculate (orderItems, amount, discount) {
-	// 	if (discount > 100 && orderItems.length !== 0) {
-	// 		return discount / orderItems.length 
+	// function calculate (order_items, amount, discount) {
+	// 	if (discount > 100 && order_items.length !== 0) {
+	// 		return discount / order_items.length 
 	// 	} else {
 	// 		return amount * parseFloat(discount / 100)
 	// 	}

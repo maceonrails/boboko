@@ -3,12 +3,12 @@ angular
   .factory('PaymentService', PaymentService)
 
 function PaymentService ($q, RestService, OrderService, TaxService) {
-	var subTotal;
-	var taxTotal;
+	var sub_total;
+	var tax_amount;
 	var total;
-	var paidAmount;
-	var returnAmount;
-	var discountAmount;
+	var paid_amount;
+	var return_amount;
+	var discount_amount;
 
 	return {
 		payOrder: payOrder,
@@ -17,59 +17,56 @@ function PaymentService ($q, RestService, OrderService, TaxService) {
 	}
 
 	function getPaymentInfo (order) {
-		subTotal = getSubTotal(order)
-		taxTotal = getTaxTotal(order)
+		sub_total = getSubTotal(order)
+		tax_amount = getTaxAmount(order)
 		total = getTotal(order)
-		paidAmount = getPaidAmount(order)
-		returnAmount = getReturnAmount(order)
+		paid_amount = getPaidAmount(order)
+		return_amount = getReturnAmount(order)
 
 		return {
-			subTotal: subTotal || 0,
-			taxTotal: taxTotal || 0,
+			sub_total: sub_total || 0,
+			tax_amount: tax_amount || 0,
 			total: total || 0,
-			paidAmount: paidAmount || 0,
-			returnAmount: returnAmount || 0,
-			discountAmount: order.discountAmount || 0
+			paid_amount: paid_amount || 0,
+			return_amount: return_amount || 0,
+			discount_amount: order.discount_amount || 0
 		}
 	}
 
 	function getSubTotal (order) {
-		var subTotal = 0
-    order.orderItems.forEach(function(orderItem) {
+		var sub_total = 0
+    order.order_items.forEach(function(orderItem) {
       if (orderItem.product)
-        subTotal += orderItem.quantity * orderItem.product.price;
+        sub_total += orderItem.quantity * orderItem.product.price;
     })
-    return subTotal
+    return sub_total
 	}
 
-	function getTaxTotal (order) {
+	function getTaxAmount (order) {
 		return TaxService.calculateTax(getSubTotal(order));
 	}
 
 	function getTotal (order) {
-		return getSubTotal(order) + getTaxTotal(order)
+		return getSubTotal(order) + getTaxAmount(order)
 	}
 
 	function getPaidAmount (order) {
-		return getTotal(order) + order.amountDiscount
+		return getTotal(order) + order.discount_amount
 	}
 
 	function getReturnAmount (order) {
-		paidAmount = getPaidAmount(order)
-		return paidAmount > order.cashAmount ? 0 : paidAmount - order.cashAmount;
+		paid_amount = getPaidAmount(order)
+		return paid_amount > order.cash_amount ? 0 : paid_amount - order.cash_amount;
 	}
 
 	function payOrder (order) {
-		order.paid = true;
-		order.orderItems.forEach(function (orderItem) {
-			orderItem.paid = true;
-		})
-		return OrderService.saveOrder(order);
+		console.log(order.name)
+		return RestService.one('orders', order.id).post("pay_order", order)
 	}
 
 	function voidOrder (order) {
 		order.void = true;
-		order.orderItems.forEach(function (orderItem) {
+		order.order_items.forEach(function (orderItem) {
 			orderItem.paid_amount = 0;
 			orderItem.void = true;
 		})
