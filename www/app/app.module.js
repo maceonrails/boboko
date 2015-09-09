@@ -25,5 +25,5 @@ angular.module('eresto', [
       StatusBar.styleDefault();
     }
   });
-
+  $rootScope.current_user = localStorageService.get('current_user');
 });

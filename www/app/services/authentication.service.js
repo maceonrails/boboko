@@ -2,7 +2,7 @@ angular
   .module('eresto.authentication.service', ['http-auth-interceptor', 'LocalStorageModule'])
   .factory('AuthenticationService', AuthenticationService)
 
-function AuthenticationService($rootScope, $http, authService, localStorageService, RestService, UserService) {
+function AuthenticationService($rootScope, $http, authService, localStorageService, RestService) {
   return {
     login: login,
     logout: logout,
@@ -17,8 +17,8 @@ function AuthenticationService($rootScope, $http, authService, localStorageServi
       if (data.role == 'cashier') {
 
         localStorageService.set('token', data.token);
-        UserService.one('users', data.id).get().then(function (user) {
-          $rootScope.currentUser = user 
+        RestService.one('users', data.id).get().then(function (data) {
+          localStorageService.set('current_user', data.user)
         })
         authService.loginConfirmed(data, function(config) {  // Step 2 & 3
           config.headers.Authorization = data.token;
@@ -47,6 +47,7 @@ function AuthenticationService($rootScope, $http, authService, localStorageServi
 
   function logout() {
     localStorageService.remove('token');
+    localStorageService.remove('current_user');
     delete $http.defaults.headers.common.Authorization;
     $rootScope.$broadcast('event:auth-logout-complete');
   }

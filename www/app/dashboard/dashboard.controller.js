@@ -6,9 +6,7 @@ function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableS
 	$scope.tables = []
 	$rootScope.orders = [];
 	$rootScope.init = init;
-
 	init();	
-
   function init() {
     TableService.getAll().then(function (tables) {
 			$scope.tables = _.groupBy(tables, 'location');
