@@ -1,5 +1,39 @@
 @import 'reset';
 
+// For login
+
+.login {
+    background: url(../img/bober.jpg);
+    background-repeat: no-repeat;
+    // background-size: contain;
+    background-position: center;
+    width: 100%;
+    height: 90%;
+    margin: auto;
+    z-index: 2;
+    position: relative;
+}
+
+.login label.item.item-input:first-child {
+  margin-top: 250px;
+}
+
+.login label.item.item-input {
+	margin-right: 303px;
+	margin-left: 303px;
+}
+
+.login button.button {
+  margin-left: 303px;
+  margin-right: 303px;
+  width: 675px;
+}
+
+a.button.button-icon.icon.ion-trash-a {
+  display: inline-block;
+  float: right;
+  margin-right: 10px;
+}
 
 // FOR DEMO PURPOSE, MIMICKING LENOVO YOGA'S SCREEN AREA - DITCH ON FINAL
 div.android-bar {

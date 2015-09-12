@@ -1,0 +1,28 @@
+<ion-view>
+
+  <div class="android-bar"></div>
+  <div class="top-bar">
+    <div class="bar-subheader page-heading">
+      <h1>
+        {{outlet.name || "Bober Cafe"}} 
+        <a class="button button-icon icon ion-refresh light" ng-click="refresh()" ng-show="$state.current.name == 'main.dashboard'"></a>
+        <a class="button button-icon icon ion-arrow-left-a light" ng-click="goBack()" ng-show="$state.current.name == 'main.order'"></a>
+      </h1> 
+    </div>
+    <div class="account-tab">
+      <p>Welcome {{name || "user"}}, <a ng-click="logout()">Logout</a></p>
+    </div>
+  </div>
+
+  <div class="card" ng-if="message">
+    <div class="item item-text-wrap">
+      {{message}}
+    </div>
+  </div>
+
+  <ion-nav-view name="mainContent" animation="slide-left-right"></ion-nav-view>
+   
+  <div class="bar bar-footer android-onscreen-buttons-bar">
+    <div class="title"></div>
+  </div>
+</ion-view>

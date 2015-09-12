@@ -22,7 +22,7 @@ function erestoPayment(){
 		}
 	};
 
-	function controller($scope, $element, $attrs, $transclude, $ionicPopup, $state, OrderService, PaymentService) {
+	function controller($scope, $element, $attrs, $transclude, $ionicPopup, $state, OrderService, PaymentService, AuthService) {
 		$scope.calcAddDigit = calcAddDigit;
 		$scope.calcAddMoney = calcAddMoney;
 		$scope.calcClear = calcClear;
@@ -60,22 +60,67 @@ function erestoPayment(){
 		}
 
 		function payAll(order, order_items) {
-	 		if (getPaidAmount(order) > order.cash_amount) {
+	 		if (getPaidAmount(order) > order.cash_amount || order.cash_amount == 0) {
 	 			$ionicPopup.alert({
 					title: 'Kesalahan',
 					template: 'Pembayaran tidak cukup atau tidak ada menu yang di pilih.'
-				}).then(function (res) {
-	 				console.log(res);
-	 			})
+				})
+	 		} else if (order.discount_amount > OrderService.getSubTotal(order)) {
+	 			$ionicPopup.alert({
+					title: 'Kesalahan',
+					template: 'Discount lebih besar dari jumlah transaksi.'
+				})
+	 		} else if (order.discount_amount > 0) {
+	 			$scope.user = {};
+	 			$ionicPopup.show({
+			   	templateUrl: 'app/order/discount-form.html',
+			   	title: 'Need verification for discount',
+			   	subTitle: 'Please input email and password',
+			   	scope: $scope,
+			   	buttons: [
+			     	{ text: 'Cancel' },
+			     	{
+			       	text: '<b>Verify</b>',
+			       	type: 'button-positive',
+			       	onTap: function(e) {
+			         	AuthService.authorizeUser($scope.user).then(function (res) {
+			         		order.discount_by = res.user.id
+					 				PaymentService.payOrder(order, order_items).then(function (order) {
+						 				$ionicPopup.alert({
+											title: 'Pembayaran berhasil',
+											scope: $scope,
+											template: '<center>Kembali:<br><br> <b>{{getReturnAmount(order) | currency: "Rp "}}</b> </center>'
+										}).then(function (res) {
+							 				console.log(res);
+							 				$state.go('main.dashboard');
+							 			})
+						 			}, function (order) {
+							 			$ionicPopup.alert({
+										  title: 'Kesalahan',
+										  template: 'Pembayaran gagal, silahkan ulangi.'
+										}).then(function(res) {	 
+							 				console.log(res);
+							 			})
+							 		})
+					 			}, function (res) {
+						 			$ionicPopup.alert({
+									  title: 'Kesalahan',
+									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
+									})
+						 		})
+			       	}
+			     	},
+			   	]
+			 	});
 	 		} else {
-	 			PaymentService.payOrder(order, order_items).then(function (order) {
+ 				PaymentService.payOrder(order, order_items).then(function (order) {
 	 				$ionicPopup.alert({
 						title: 'Pembayaran berhasil',
 						scope: $scope,
 						template: '<center>Kembali:<br><br> <b>{{getReturnAmount(order) | currency: "Rp "}}</b> </center>'
 					}).then(function (res) {
 		 				console.log(res);
-		 				$state.go('auth.dashboard');
+		 				$state.go('main.dashboard');
 		 			})
 	 			}, function (order) {
 		 			$ionicPopup.alert({

@@ -21,11 +21,14 @@
     <script src="app/app.module.js"></script>
     <script src="app/app.config.js"></script>
     <script src="app/app.routes.js"></script>
-    <script src="app/auth/auth.controller.js"></script>
+    <script src="app/app.constants.js"></script>
+    <script src="app/app.controller.js"></script>
+    <script src="app/main/main.controller.js"></script>
     <script src="app/dashboard/dashboard.controller.js"></script>
     <script src="app/login/login.controller.js"></script>
     <script src="app/order/order.controller.js"></script>
     <script src="app/services/authentication.service.js"></script>
+    <script src="app/services/auth.service.js"></script>
     <script src="app/services/discount.service.js"></script>
     <script src="app/services/menu.service.js"></script>
     <script src="app/services/order.service.js"></script>
@@ -40,7 +43,7 @@
     <script src="app/order/payment.directive.js"></script>
   </head>
 
-  <body ng-app="eresto">
+  <body ng-app="eresto" ng-controller="AppCtrl">
     <div class="main-container cf">
       <ion-nav-view animation="slide-left-right">
         <!-- Center content -->

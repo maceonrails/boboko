@@ -1,39 +1,15 @@
 angular
-  .module('eresto.auth', ['http-auth-interceptor'])
-  .controller('AuthCtrl', AuthCtrl)
+  .module('eresto.app', ['http-auth-interceptor'])
+  .controller('AppCtrl', AppCtrl)
 
-function AuthCtrl($rootScope, $scope, $state, AuthenticationService, $ionicPopup, localStorageService) {
+function AppCtrl($rootScope, $scope, $state, AuthenticationService, $ionicPopup, localStorageService, $window) {
   $scope.message = "";
   $scope.isLogin = true;
   $scope.user = {
     username: null,
     password: null
   };
-  function showHostPopup (argument) {
-    $scope.host = {};
-    $ionicPopup.show({
-      template: '<input type="text" ng-model="host.target">',
-      title: 'Add host target',
-      scope: $scope,
-      buttons: [
-        { text: 'Cancel' },
-        {
-          text: '<b>Update</b>',
-          type: 'button-positive',
-          onTap: function(e) {
-            if (!$scope.host.target) {
-              e.preventDefault();
-            } else {
-              localStorageService.set('host', $scope.host.target);
-              $rootScope.init();
-
-            }
-          }
-        },
-      ]
-    }).then(function (host) {});
-  }
- 
+  
   $scope.login = function() {
     AuthenticationService.login($scope.user);
   };
@@ -59,6 +35,7 @@ function AuthCtrl($rootScope, $scope, $state, AuthenticationService, $ionicPopup
    $scope.username = null;
    $scope.password = null;
    $scope.isLogin = true;
+
    $ionicPopup.alert({
       title: 'Success',
       template: "Login Success"

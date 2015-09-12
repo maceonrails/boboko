@@ -1,34 +1,59 @@
 angular
-  .module('eresto.routes', [])
-  .config(function($stateProvider, $urlRouterProvider) {
+  .module('eresto.routes', ['eresto.constants'])
+  .config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 
     $stateProvider
-      .state('auth', {
+      .state('main', {
         url: "",
         abstract: true,
-        templateUrl: "app/auth/auth.html",
-        controller: 'AuthCtrl'
+        cache: false,
+        templateUrl: "app/main/main.html",
       })
-      .state('auth.dashboard', {
+      .state('main.dashboard', {
         url: "/dashboard",
+        cache: false,
+        resolve: {
+          tables: function (TableService) {
+            return TableService.getAll().then(function (tables) {
+              return _.groupBy(tables, 'location');
+            });
+          },
+          orders: function (OrderService) {
+            return OrderService.getWaitingOrders().then(function (orders) {
+              return orders;
+            });
+          }
+        },
         views: {
-          'menuContent' :{
+          'mainContent' :{
             controller:  "DashboardCtrl",
             templateUrl: "app/dashboard/dashboard.html"              
           }
+        },
+        data: {
+          authorizedRoles: [USER_ROLES.cashier]
         }
       })      
-      .state('auth.order', {
+      .state('main.order', {
         url: "/order/:id",
         cache: false,
         views: {
-          'menuContent' :{
+          'mainContent' :{
             templateUrl: "app/order/order.html",
             controller: 'OrderCtrl'
           }
+        },
+        data: {
+          authorizedRoles: [USER_ROLES.cashier]
         }
       })
+      .state('login', {
+        url: "/login",
+        cache: false,
+        templateUrl: "app/login/login.html",
+        controller: 'LoginCtrl'
+      })
 
-     $urlRouterProvider.otherwise("/dashboard");
+    $urlRouterProvider.otherwise('/login');
 
   });

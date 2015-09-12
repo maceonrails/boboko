@@ -2,6 +2,7 @@
   <ion-content>
   	<div class="left-container">
 			<div class="left-inner-container">
+				<a class="btn-add-order btn-disabled" ng-if="orderBlank" ng-click="deleteOrder(order)"></a>
 				<a class="btn-add-order btn-disabled" ng-click="showMenu()"></a>
 				<div class="order-table-properties">
 					<h2 class="order-table-number">Order</h2>

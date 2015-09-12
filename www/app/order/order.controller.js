@@ -2,7 +2,7 @@ angular
 	.module('eresto.order', [])
 	.controller('OrderCtrl', OrderCtrl)
 
-function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ionicPopup){
+function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ionicPopup, PaymentService){
 	$scope.showMenu = showMenu;
 	$scope.hideMenu = hideMenu;
 	$scope.showCalculator = showCalculator;
@@ -10,6 +10,8 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$scope.voidOrder = voidOrder;
 	$scope.saveOrder = saveOrder;
 	$scope.cancelSplit = cancelSplit;
+	$scope.removeOrder = removeOrder;
+	$scope.orderHeader = orderHeader;
 
 	// Discount
 	$scope.addPercentDiscount = addPercentDiscount;
@@ -32,7 +34,9 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 		OrderService.find($stateParams.id).then(function (order) {
 			$scope.order = order
 			$scope.order.discount_amount = 0
+			$scope.order.discount_percent = 0
 			$scope.order.cash_amount = 0
+			$scope.itemBlank = order.order_items.length < 1
 
 			$scope.split_order.id = order.id
 			$scope.split_order.name = order.name
@@ -42,6 +46,14 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 		});
 	}
 
+
+	function orderHeader (order) {
+		if (order.table_id) {
+			return "Meja " + order.table_id
+		} else {
+			return "# " + order.queue_number
+		}
+	}
 
 	function showMenu() {
 		$rootScope.show = 'menu';
@@ -68,10 +80,11 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 		$rootScope.show = 'calculator'
 	}
 
- 	function addDiscountAmount () {
- 		$scope.discount = {};
-	 	var discountPopup = $ionicPopup.show({
-	   	templateUrl: 'app/order/discount-form.html',
+ 	function addDiscountAmount (order) {
+ 		$scope.discount = {}
+ 		$scope.order = order
+	 	$ionicPopup.show({
+	   	template: '<input type="text" ng-model="discount.amount">',
 	   	title: 'Add Amount Discount',
 	   	subTitle: 'Please input Amount discount',
 	   	scope: $scope,
@@ -81,23 +94,22 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	       	text: '<b>Gift</b>',
 	       	type: 'button-positive',
 	       	onTap: function(e) {
-	         	if (!$scope.discount.amount) {
+	       		console.log(order)
+	         	if (!$scope.discount.amount || $scope.discount.amount > OrderService.getSubTotal($scope.order)) {
 	           	e.preventDefault();
 	         	} else {
-	         		$scope.discount_amount = $scope.discount.amount;
+	         		$scope.order.discount_amount = $scope.discount.amount;
 	         	}
 	       	}
 	     	},
 	   	]
 	 	});
-	 	discountPopup.then(function(name) {	 
-	 	});
  	}
 
- 	function addPercentDiscount () {
+ 	function addPercentDiscount (order) {
  		$scope.discount = {};
-	 	var percentPopup = $ionicPopup.show({
-	   	templateUrl: 'app/order/discount-form.html',
+	 	$ionicPopup.show({
+	   	template: '<input type="text" ng-model="discount.percent">',
 	   	title: 'Add percent Discount',
 	   	subTitle: 'Please input percent Discount (0 - 100)',
 	   	scope: $scope,
@@ -107,22 +119,21 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	       	text: '<b>Gift</b>',
 	       	type: 'button-positive',
 	       	onTap: function(e) {
-	         	if (!$scope.discount.amount) {
+	         	if (!$scope.discount.percent || $scope.discount.percent > 100 || $scope.discount.percent < 0) {
 	           	e.preventDefault();
 	         	} else {
-							$scope.discount_amount = ($scope.discount.amount / 100) * $scope.sub_total;
+							order.discount_amount = ($scope.discount.percent / 100) * OrderService.getSubTotal(order);
 	         	}
 	       	}
 	     	},
 	   	]
 	 	});
-	 	percentPopup.then(function(discount_amount) {	 
-	 	});
  	}
 
  	function voidOrder (order, order_items) {
  		$scope.void = {};
-	 	var myPopup = $ionicPopup.show({
+ 		$scope.user = {};
+	 	$ionicPopup.show({
 	   	templateUrl: 'app/order/void-form.html',
 	   	title: 'Void Order',
 	   	subTitle: 'Please input reason',
@@ -134,29 +145,38 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	       	type: 'button-positive',
 	       	onTap: function(e) {
 	         	order.void_note = $scope.void.note;
-	         	PaymentService.payOrder(order, order_items).then(function (res) {
+
+	         	PaymentService.voidOrder(order, $scope.user, order_items).then(function (res) {
 			 				$ionicPopup.alert({
 								title: 'Void Sukses',
 								scope: $scope,
 								template: '<center>Reason:<br><br> <b>{{ void.note }}</b> </center>'
 							}).then(function (res) {
 				 				console.log(res);
-				 				$state.go('auth.dashboard');
+				 				$state.go('main.dashboard');
 				 			})
 			 			}, function (res) {
 				 			$ionicPopup.alert({
 							  title: 'Kesalahan',
 							  template: 'Void gagal, silahkan ulangi.'
-							}).then(function(res) {	 
-				 				console.log(res);
-				 			})
+							})
 				 		})
 	       	}
 	     	},
 	   	]
 	 	});
-	 	myPopup.then(function(name) {	 		
-	 	});
+ 	}
+
+ 	function removeOrder (order) {
+ 		$ionicPopup.confirm({
+     	title: 'Delete Order',
+     	template: 'Apakah yakin untuk menghapus order?'
+   	}).then(function(res) {
+     	if(res) {
+       	order.remove();
+       	$state.go('main.dashboard');
+     	}
+   	});
  	}
 
  	function saveOrder (order, order_items) {
@@ -167,15 +187,14 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 				template: '<center>Order berhasil disimpan, silahkan tunggu.</center>'
 			}).then(function (res) {
  				console.log(res);
- 				$state.go('auth.dashboard');
+ 				$state.go('main.dashboard');
+ 				$scope.refresh();
  			})
-			}, function (res) {
+		}, function (res) {
  			$ionicPopup.alert({
 			  title: 'Terjadi Kesalahan',
 			  template: 'Order gagal, silahkan ulangi.'
-			}).then(function(res) {	 
- 				console.log(res);
- 			})
+			})
  		})
  	}
  	

@@ -1,17 +1,29 @@
-    <ion-header-bar class="bar-stable">
-      <h1 class="title">Login</h1>
-    </ion-header-bar> 
-    <ion-content has-header="true" padding="true">
-      <form class="list">
-        <div>{{message}}</div>
-        <label class="item item-input">
-          <input type="text" placeholder="Username" ng-model="user.username" required>
-        </label>
-        <label class="item item-input">
-          <input type="password" placeholder="Password" ng-model="user.password" required>
-        </label>
-        <div class="padding">
-          <button class="button button-block button-stable" ng-click="login()">Login</button>
-        </div>
-      </form>
-    </ion-content>
+<ion-view view-title="Login">
+	<div class="android-bar"></div>
+  <div class="top-bar">
+    <div class="bar-subheader page-heading">
+      <h1>{{outlet.name || "Bober Cafe"}}</h1>
+    </div>
+    <div class="account-tab">
+      <p style="display: inline-block">Please Login</p>
+    	<p ng-click="setHost()" style="display: inline-block"> | Set host</p>
+    </div>
+  </div>
+
+	<div class="list list-inset login" has-header="true" padding="true">
+	  <label class="item item-input">
+	    <input type="text" placeholder="Username" ng-model="user.email" required>
+	  </label>
+	  <label class="item item-input">
+	    <input type="password" placeholder="Password" ng-model="user.password" required>
+	  </label>
+	  <button class="button button-block button-positive" ng-click="login(user)">
+	    Login
+	  </button>
+	</div>
+
+	<div class="bar bar-footer android-onscreen-buttons-bar">
+	  <div class="title"></div>
+	</div>
+</ion-view>
+

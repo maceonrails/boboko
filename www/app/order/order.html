@@ -1,17 +1,18 @@
-<ion-view view-title="Title">
+<ion-view view-title="Order">
   <ion-content>
   	<div class="left-container" ng-hide="show=='splitCalculator'">
 			<div class="left-inner-container">
 				<a class="btn-add-order btn-disabled" ng-click="showMenu()"></a>
+				
 				<div class="order-table-properties">
-					<h2 class="order-table-number">Order</h2>
+					<h2 class="order-table-number">Order {{ orderHeader(order) }} <a class="button button-icon icon ion-trash-a" ng-if="itemBlank" ng-click="removeOrder(order)"></a></h2>
 					<h3 class="order-table-customer">{{order.name}}</h3>
 				</div>
 				<eresto-item-list order="order"> </eresto-item-list>
 			</div>
 			<ul class="transactional-buttons-container" ng-hide="show == 'split'">
 				<li>
-					<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, order_items)"></a>
+					<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, order.order_items)"></a>
 					<p>Void</p>
 				</li>
 				<li>
@@ -19,11 +20,11 @@
 					<p>Bayar Pisah</p>
 				</li>
 				<li>
-					<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="addDiscountAmount()"></a>
+					<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="addDiscountAmount(order)"></a>
 					<p>Diskon Rp</p>
 				</li>
 				<li>
-					<a class="btn-rounded btn-secondary btn-transaction-diskon-persen" href="#" ng-click="addPercentDiscount()"></a>
+					<a class="btn-rounded btn-secondary btn-transaction-diskon-persen" href="#" ng-click="addPercentDiscount(order)"></a>
 					<p>Diskon %</p>
 				</li>
 				<li>

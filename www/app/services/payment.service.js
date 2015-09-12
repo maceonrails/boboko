@@ -64,12 +64,12 @@ function PaymentService ($q, RestService, OrderService, TaxService) {
 		return RestService.one('orders', order.id).post("pay_order", order)
 	}
 
-	function voidOrder (order) {
-		order.void = true;
-		order.order_items.forEach(function (orderItem) {
+	function voidOrder (order, user, order_items) {
+		order_items.forEach(function (orderItem) {
 			orderItem.paid_amount = 0;
 			orderItem.void = true;
+			orderItem.void_note = order.void_note;
 		})
-		return OrderService.saveOrder(order);
+		return order.post("void_order", {order_items: order_items}, {order_id: order.id, email: user.email, password: user.password});
 	}
 }

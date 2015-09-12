@@ -2,7 +2,8 @@ angular.module('eresto', [
   'ionic',
   'eresto.config',
   'eresto.routes',
-  'eresto.auth',
+  'eresto.controller',
+  'eresto.constants',
   'eresto.login',
   'eresto.dashboard',
   'eresto.order',
@@ -11,7 +12,8 @@ angular.module('eresto', [
   'eresto.payment.service',
   'eresto.discount.service',
   'eresto.menu.service',
-  'eresto.table.service'
+  'eresto.table.service',
+  'eresto.auth.service'
 ])
 
 .run(function($rootScope, $ionicPlatform, localStorageService) {
@@ -25,5 +27,24 @@ angular.module('eresto', [
       StatusBar.styleDefault();
     }
   });
-  $rootScope.current_user = localStorageService.get('current_user');
+})
+
+.run(function ($rootScope, $state, AuthService, AUTH_EVENTS) {
+  $rootScope.$on('$stateChangeStart', function (event,next, nextParams, fromState) {
+    if ('data' in next && 'authorizedRoles' in next.data) {
+      var authorizedRoles = next.data.authorizedRoles;
+      if (!AuthService.isAuthorized(authorizedRoles)) {
+        event.preventDefault();
+        // $state.go('$state.current', {}, {reload: true});
+        $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
+      }
+    }
+
+    if (!AuthService.isAuthenticated()) {
+      if (next.name !== 'login') {
+        event.preventDefault();
+        $state.go('login');
+      }
+    }
+  });
 });

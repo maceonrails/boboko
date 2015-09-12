@@ -84,7 +84,7 @@ function erestoItemList(OrderService, TaxService){
 		 		if ($scope.orderItem.quantity < lastQuantity) {
  					if ($scope.orderItem.id) {
 		 				$ionicPopup.show({
-					   	template: '<input type="text" ng-model="user.email"><input type="password" ng-model="user.password">',
+					   	templateUrl: 'app/order/void-form.html',
 					   	title: 'Need Verification',
 					   	subTitle: 'Please input email and password',
 					   	scope: $scope,
@@ -97,7 +97,7 @@ function erestoItemList(OrderService, TaxService){
 					     	},
 
 					     	{
-					       	text: '<b>Gift</b>',
+					       	text: '<b>Void</b>',
 					       	type: 'button-positive',
 					       	onTap: function(e) {
 					         	if (!$scope.user.name || !$scope.name.pass) {

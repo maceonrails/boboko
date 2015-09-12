@@ -2,18 +2,19 @@ angular
 	.module('eresto.dashboard', [])
 	.controller('DashboardCtrl', DashboardCtrl)
 
-function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, RestService){
-	$scope.tables = []
-	$rootScope.orders = [];
+function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, RestService, localStorageService, tables, orders){
+	$rootScope.current_user = localStorageService.get('current_user');
+	$scope.tables = tables
+	$rootScope.orders = orders;
 	$rootScope.init = init;
-	init();	
+	
   function init() {
+  	console.log('init')
     TableService.getAll().then(function (tables) {
 			$scope.tables = _.groupBy(tables, 'location');
-			OrderService.getWaitingOrders().then(function (orders) {
-				$rootScope.orders = orders;
-				$timeout(init, 10000)
-			})
+		})
+		OrderService.getWaitingOrders().then(function (orders) {
+			$rootScope.orders = orders;
 		})
   }
 
@@ -22,7 +23,7 @@ function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableS
 	$scope.showTable = showTable;
 
 	function showTable (table) {
-		if (table.occupied && table.order_id) {
+		if (table.order_id) {
 			showOrder(table.order_id)
 		} else {
 			addOrder(table)
@@ -30,7 +31,7 @@ function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableS
 	}
 
 	function showOrder (order_id) {
-		$state.go('auth.order', {id: order_id});
+		$state.go('main.order', {id: order_id});
 	}
 
 	function addOrder(table) {

@@ -16,7 +16,7 @@
 				<a class="btn-add-queue" ng-click="addOrder()"></a>
 			</div>
 			<ul class="take-away-queue-container cf">
-				<li ng-click="showOrder(order.id)" ng-repeat="order in orders">{{order.name}}<span>#{{++$index}}</li>
+				<li ng-click="showOrder(order.id)" ng-repeat="order in orders">{{order.name}}<span>#{{order.queue_number}}</li>
 			</ul>
 		</div>
 	</ion-content>

@@ -2,7 +2,7 @@ angular
   .module('eresto.order.service', ['eresto.rest.service', 'eresto.tax.service'])
   .factory('OrderService', OrderService)
 
-function OrderService(RestService, TaxService, $q){
+function OrderService(RestService, TaxService, $q, AuthService){
   var base = RestService.all('orders');
   return {
     getWaitingOrders: getWaitingOrders,
@@ -25,6 +25,8 @@ function OrderService(RestService, TaxService, $q){
   function addMenu (product, order) {
     var orderItem = RestService.one('order_items');
     orderItem.product_id = product.id;
+    orderItem.product = {}
+    orderItem.product.choices = product.choices
     orderItem.order_id = order.id;
     orderItem.price = product.price;
     orderItem.name = product.name;
@@ -206,7 +208,7 @@ function OrderService(RestService, TaxService, $q){
   }
 
   function getPaidAmount (order) {
-    return getTotal(order) + order.discount_amount;
+    return getTotal(order) - order.discount_amount;
   }
 
   function getReturnAmount (order) {
@@ -221,6 +223,7 @@ function OrderService(RestService, TaxService, $q){
   }
 
   function create(order) {
+    order.servant_id = AuthService.id();
     return base.post({order: order}).then(function (order) {
       return order;
     });
