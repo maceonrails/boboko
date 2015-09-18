@@ -21,7 +21,7 @@ function erestoItemList(OrderService, TaxService){
 		}
 	};
 
-	function controller($scope, $ionicPopup, $element, $attrs, $transclude, OrderService, TaxService) {
+	function controller($scope, $ionicPopup, $element, $attrs, $transclude, OrderService, TaxService, PaymentService, AuthService, $state) {
 		$scope.clickItem = clickItem
 		$scope.getSubTotal = getSubTotal;
 		$scope.getTaxAmount = getTaxAmount;
@@ -57,7 +57,7 @@ function erestoItemList(OrderService, TaxService){
 		function showItemDetail (orderItem) {
 	 		var lastQuantity = orderItem.quantity;
 	 		$scope.orderItem = orderItem;
-		 	var myPopup = $ionicPopup.show({
+		 	$ionicPopup.show({
 		   	templateUrl: 'app/order/item-detail.html',
 		   	title: 'Order Item detail',
 		   	subTitle: 'Input quantity or write note',
@@ -67,22 +67,21 @@ function erestoItemList(OrderService, TaxService){
 		     		text: 'Cancel', 
 		     		onTap: function (e) {
 		     			$scope.orderItem = orderItem
+		     			return false
 		     		}
 		     	},
 		     	{
 		       	text: '<b>Set</b>',
 		       	type: 'button-positive',
-		       	onTap: onTap
+		       	onTap: function (e) {
+		       		return true
+			     	}
 		     	},
 		   	]
-		 	});
-		 	myPopup.then(function(orderItem) {
-
-		 	});
-
-		 	function onTap(e) {
-		 		if ($scope.orderItem.quantity < lastQuantity) {
+		 	}).then(function (res) {
+		 		if (res && $scope.orderItem.quantity < lastQuantity) {
  					if ($scope.orderItem.id) {
+ 						$scope.user = {};
 		 				$ionicPopup.show({
 					   	templateUrl: 'app/order/void-form.html',
 					   	title: 'Need Verification',
@@ -100,14 +99,35 @@ function erestoItemList(OrderService, TaxService){
 					       	text: '<b>Void</b>',
 					       	type: 'button-positive',
 					       	onTap: function(e) {
-					         	if (!$scope.user.name || !$scope.name.pass) {
+					         	if (!$scope.user.email || !$scope.user.password) {
 					           	e.preventDefault();
 					         	} else {
-					         		AuthenticationService.authorizeUser($scope.user).then(function (res) {
-					         			$scope.orderItem.provider_id = res;
-					         			$scope.orderItem.void = true;
-					         			$scope.orderItem.void_note = $scope.void_note;
-					         			$scope.orderItem.void_quantity = $scope.void_quantity;
+					         		AuthService.authorizeUser($scope.user).then(function (res) {
+					         			debugger
+					         			$scope.orderItem.void_by = res.user.id;
+					         			$scope.orderItem.void_quantity = lastQuantity - $scope.orderItem.quantity;
+					         			PaymentService.voidItem($scope.orderItem).then(function (res) {
+					         				if ($scope.orderItem.quantity == 0) {
+										 				_.remove($scope.order.order_items, {
+														  product_id: orderItem.product_id
+														});
+										 			}
+					         				$ionicPopup.alert({
+														title: 'Void Sukses',
+														scope: $scope,
+														template: '<center>Reason:<br><br> <b>{{ $scope.orderItem.void_note }}</b> </center>'
+													})
+									 			}, function (res) {
+									 				debugger
+									 				$scope.orderItem.quantity = lastQuantity
+										 			$ionicPopup.alert({
+													  title: 'Kesalahan',
+													  template: 'Void gagal, silahkan ulangi.'
+													})
+					         			})
+					         		}, function (response) {
+					         			$scope.orderItem.quantity = lastQuantity
+					         			debugger
 					         		})
 					         	}
 					       	}
@@ -115,13 +135,16 @@ function erestoItemList(OrderService, TaxService){
 					   	]
 					 	});
 		 			} else {
-		 				if ($scope.orderItem.quantity == 0) 
+		 				if ($scope.orderItem.quantity == 0) {
 			 				_.remove($scope.order.order_items, {
 							  product_id: orderItem.product_id
 							});
+			 			}
 		 			}
+		 		} else if (!res && $scope.orderItem.quantity < lastQuantity) {
+		 			$scope.orderItem.quantity = lastQuantity
 		 		}
-     	}
+		 	})
 	 	}
 
 	 	function getSubTotal(order) {

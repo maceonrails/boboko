@@ -2,16 +2,16 @@ angular
   .module('eresto.controller', [])
   .controller('AppCtrl', AppCtrl)
 
-function AppCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, localStorageService, $window, $rootScope, $log, $ionicHistory) {
+function AppCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, localStorageService, $window, $rootScope, $log, $ionicLoading, $timeout) {
   $scope.username = AuthService.username();
   $scope.name = AuthService.name();
   $scope.$state = $state
 
-  $scope.goBack = function() {
+  $rootScope.goBack = function() {
     $state.go('main.dashboard')
   };
 
-  $scope.refresh = function () {
+  $rootScope.refresh = function () {
     $rootScope.init();
     // $state.go($state.current, {}, { reload: true });
     // $log.debug('refresh')
@@ -21,34 +21,6 @@ function AppCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, localSto
     AuthService.logout();
     $state.go('login');
   };
-
-  $rootScope.setHost = setHost
-
-  function setHost() {
-    $scope.host = {};
-    $scope.host.target = localStorageService.get('host');
-
-    $ionicPopup.show({
-      template: '<input type="text" ng-model="host.target">',
-      title: 'Add host target',
-      scope: $scope,
-      buttons: [
-        { text: 'Cancel' },
-        {
-          text: '<b>Update</b>',
-          type: 'button-positive',
-          onTap: function(e) {
-            if (!$scope.host.target) {
-              e.preventDefault();
-            } else {
-              localStorageService.set('host', $scope.host.target);
-              $window.location.reload(true)
-            }
-          }
-        },
-      ]
-    })
-  }
  
   $scope.$on(AUTH_EVENTS.notAuthorized, function(event) {
     var alertPopup = $ionicPopup.alert({
@@ -76,6 +48,18 @@ function AppCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, localSto
       template: 'Please check host or call your administrator.'
     });
   });
+
+  $rootScope.$on('loading:show', function() {
+    $ionicLoading.show({
+      template: '<ion-spinner icon="android"></ion-spinner> <span class="spinner-text">Loading...</span>',
+      animation: 'fade-in',
+      showBackdrop: true,
+    })
+  })
+
+  $rootScope.$on('loading:hide', function() {
+    $ionicLoading.hide()
+  })
  
   $scope.setCurrentUsername = function(name) {
     $scope.name = name;

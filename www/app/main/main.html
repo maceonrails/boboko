@@ -1,12 +1,10 @@
-<ion-view>
-
-  <div class="android-bar"></div>
-  <div class="top-bar">
-    <div class="bar-subheader page-heading">
+<div class="main-container cf">
+  <div class="top-bar bar-header">
+    <div class="page-heading">
       <h1>
         {{outlet.name || "Bober Cafe"}} 
-        <a class="button button-icon icon ion-refresh light" ng-click="refresh()" ng-show="$state.current.name == 'main.dashboard'"></a>
-        <a class="button button-icon icon ion-arrow-left-a light" ng-click="goBack()" ng-show="$state.current.name == 'main.order'"></a>
+        <button class="button button-icon icon ion-refresh light" ng-click="refresh()" ng-show="$state.current.name == 'main.dashboard'"></button>
+        <button class="button button-icon icon ion-arrow-left-a light" ng-click="goBack()" ng-show="$state.current.name == 'main.order'"></button>
       </h1> 
     </div>
     <div class="account-tab">
@@ -20,9 +18,5 @@
     </div>
   </div>
 
-  <ion-nav-view name="mainContent" animation="slide-left-right"></ion-nav-view>
-   
-  <div class="bar bar-footer android-onscreen-buttons-bar">
-    <div class="title"></div>
-  </div>
-</ion-view>
+  <ion-nav-view name="mainContent" animation="slide-left-right" class="content"></ion-nav-view>
+</div>

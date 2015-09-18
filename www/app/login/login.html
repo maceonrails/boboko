@@ -1,29 +1,18 @@
-<ion-view view-title="Login">
-	<div class="android-bar"></div>
-  <div class="top-bar">
-    <div class="bar-subheader page-heading">
+<div class="main-container cf">  
+  <div class="top-bar bar-header">
+    <div class="page-heading">
       <h1>{{outlet.name || "Bober Cafe"}}</h1>
     </div>
     <div class="account-tab">
-      <p style="display: inline-block">Please Login</p>
+      <p style="display: inline-block">Please <span ng-click="showLogin()">Login</span></p>
     	<p ng-click="setHost()" style="display: inline-block"> | Set host</p>
     </div>
   </div>
 
-	<div class="list list-inset login" has-header="true" padding="true">
-	  <label class="item item-input">
-	    <input type="text" placeholder="Username" ng-model="user.email" required>
-	  </label>
-	  <label class="item item-input">
-	    <input type="password" placeholder="Password" ng-model="user.password" required>
-	  </label>
-	  <button class="button button-block button-positive" ng-click="login(user)">
-	    Login
-	  </button>
+	<div class="wrapper">
+		<div class="login-wrapper">
+			
+		</div>
 	</div>
-
-	<div class="bar bar-footer android-onscreen-buttons-bar">
-	  <div class="title"></div>
-	</div>
-</ion-view>
+</div>
 

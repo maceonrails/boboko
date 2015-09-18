@@ -1,5 +1,9 @@
 angular.module('eresto.config', ['restangular', 'LocalStorageModule'])
-.config(function(RestangularProvider, localStorageServiceProvider, $httpProvider) {
+.service('APIInterceptor', APIInterceptor)
+.service('AuthInterceptor', AuthInterceptor)
+.config(config)
+
+function config(RestangularProvider, localStorageServiceProvider, $httpProvider) {
   RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
     var extractedData;
     // .. to look for getList operations
@@ -14,18 +18,50 @@ angular.module('eresto.config', ['restangular', 'LocalStorageModule'])
   });
 
   var domain = window.location.hostname;
-  domain = domain === 'localhost' ? '' : domain;
+      domain = domain === 'localhost' ? '' : domain;
+
   localStorageServiceProvider
     .setPrefix('eresto')
     .setStorageType('sessionStorage')
     .setStorageCookieDomain(domain);
 
-  // RestangularProvider
-  //   .setBaseUrl('http://localhost:3000/v1');
-
   // $httpProvider.interceptors.push('APIInterceptor');
-})
-.service('APIInterceptor', function($rootScope, localStorageService, $q, $injector) {
+  $httpProvider.interceptors.push('AuthInterceptor');
+}
+
+function AuthInterceptor($rootScope, $q, AUTH_EVENTS, TOKEN_KEY, localStorageService) {
+  var service = this
+  
+  service.responseError = function (response) {
+    $rootScope.$broadcast('loading:hide')
+    // $rootScope.$broadcast({
+    //   400: AUTH_EVENTS.badRequest,
+    //   401: AUTH_EVENTS.notAuthenticated,
+    //   403: AUTH_EVENTS.notAuthorized,
+    //   404: AUTH_EVENTS.badRequest
+    // }[response.status], response);
+    return $q.reject(response);
+  } 
+  service.requestError = function(response) {
+    $rootScope.$broadcast('loading:hide')
+    return $q.reject(response);
+  }
+  service.request = function(config) {
+    $rootScope.$broadcast('loading:show')
+    if(!config.params) {
+      config.params = {};
+    }
+    
+    config.params.token = localStorageService.get(TOKEN_KEY);
+    return config || $q.when(config);
+  }
+  service.response = function (response) {
+    $rootScope.$broadcast('loading:hide')
+    return response
+  }
+}
+
+function APIInterceptor($rootScope, localStorageService, $q, $injector) {
   var service = this;
 
   service.request = function(config) {
@@ -69,4 +105,5 @@ angular.module('eresto.config', ['restangular', 'LocalStorageModule'])
     }
     return response;
   };
-})
+}
+

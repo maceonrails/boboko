@@ -2,8 +2,7 @@ angular
 	.module('eresto.dashboard', [])
 	.controller('DashboardCtrl', DashboardCtrl)
 
-function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, RestService, localStorageService, tables, orders){
-	$rootScope.current_user = localStorageService.get('current_user');
+function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, localStorageService, tables, orders){
 	$scope.tables = tables
 	$rootScope.orders = orders;
 	$rootScope.init = init;
@@ -26,7 +25,10 @@ function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableS
 		if (table.order_id) {
 			showOrder(table.order_id)
 		} else {
-			addOrder(table)
+			$ionicPopup.alert({
+			  title: 'Tidak ada order',
+			  template: 'Maaf, tidak ada order di meja {{ table.name }}.'
+			})
 		}
 	}
 
@@ -41,8 +43,8 @@ function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableS
 	 		$scope.order.table_id = table.id;
 	 	}
 	 	// An elaborate, custom popup
-	 	var myPopup = $ionicPopup.show({
-	   	template: '<input type="text" ng-model="order.name">',
+	 	$ionicPopup.show({
+	   	templateUrl: 'app/dashboard/order-form.html',
 	   	title: 'Take away Order',
 	   	subTitle: 'Please input name',
 	   	scope: $scope,
@@ -56,13 +58,6 @@ function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableS
 	           	e.preventDefault();
 	         	} else {
 	         		OrderService.create($scope.order).then(function(order) {
-			     			if (table) {
-			     				table.order_id = order.id;
-			     				table.occupied = true;
-				     			RestService.one('tables', table.id).customPUT({table: table}).then(function (res) {
-				     				console.log(res);
-				     			});
-			     			}
 				     		showOrder(order.id);
 	         		})
 	         	}
@@ -70,8 +65,5 @@ function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableS
 	     	},
 	   	]
 	 	});
-	 	myPopup.then(function(name) {	 		
-	 	});
-
 	};
 }

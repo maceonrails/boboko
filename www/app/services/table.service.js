@@ -2,8 +2,8 @@ angular
 	.module('eresto.table.service', [])
 	.factory('TableService', TableService)
 
-function TableService(RestService){
-  var base = RestService.all('tables');
+function TableService(Restangular){
+  var base = Restangular.all('tables');
   return {
     getAll: getAll,
   }

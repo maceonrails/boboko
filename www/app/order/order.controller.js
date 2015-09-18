@@ -9,6 +9,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$scope.showSplit = showSplit;
 	$scope.voidOrder = voidOrder;
 	$scope.saveOrder = saveOrder;
+	$scope.printOrder = printOrder;
 	$scope.cancelSplit = cancelSplit;
 	$scope.removeOrder = removeOrder;
 	$scope.orderHeader = orderHeader;
@@ -21,16 +22,23 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 
 	init();
 
+	$rootScope.show = ''
+	$scope.split_order = {};
+	$scope.order = {}
+	$scope.order.order_items = []
+	$scope.split_order.order_items = []
+	$scope.split_order.type = 'split'
+	$scope.split_order.id = $stateParams.id
+	$scope.split_order.discount_amount = 0
+	$scope.split_order.cash_amount = 0
+
+	$scope.order.subTotal = 0
+	$scope.order.taxAmount = 0
+	$scope.order.total = 0
+	$scope.order.tax = 0
+	$scope.order.paidAmount = 0
+	
 	function init() {
-		$rootScope.show = ''
-		$scope.split_order = {};
-		$scope.order = {}
-		$scope.order.order_items = []
-		$scope.split_order.order_items = []
-		$scope.split_order.type = 'split'
-		$scope.split_order.id = $stateParams.id
-		$scope.split_order.discount_amount = 0
-		$scope.split_order.cash_amount = 0
 		OrderService.find($stateParams.id).then(function (order) {
 			$scope.order = order
 			$scope.order.discount_amount = 0
@@ -49,9 +57,9 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 
 	function orderHeader (order) {
 		if (order.table_id) {
-			return "Meja " + order.table_id
+			return "Meja " + order.table_name + " (" + order.table_location + ")"
 		} else {
-			return "# " + order.queue_number
+			return "#" + order.queue_number
 		}
 	}
 
@@ -173,13 +181,23 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
      	template: 'Apakah yakin untuk menghapus order?'
    	}).then(function(res) {
      	if(res) {
-       	order.remove();
-       	$state.go('main.dashboard');
+     		OrderService.find(order.id).then(function (order) {
+						if (order.order_items.length < 1) {
+       			order.remove();
+       			$state.go('main.dashboard');
+       		} else {
+       			$ionicPopup.alert({
+							title: 'Hapus order gagal',
+							scope: $scope,
+							template: '<center>Maaf, order sudah memiliki pesanan. silahkan lakukan void jika ingin menghapus.</center>'
+						})
+       		}
+       	})
      	}
    	});
  	}
 
- 	function saveOrder (order, order_items) {
+ 	function saveOrder (order) {
  		OrderService.saveOrder(order).then(function (res) {
 			$ionicPopup.alert({
 				title: 'Order sukses',
@@ -194,6 +212,24 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
  			$ionicPopup.alert({
 			  title: 'Terjadi Kesalahan',
 			  template: 'Order gagal, silahkan ulangi.'
+			})
+ 		})
+ 	}
+
+ 	function printOrder (order, type) {
+ 		OrderService.printOrder(order, type).then(function (res) {
+			$ionicPopup.alert({
+				title: 'Print Order',
+				scope: $scope,
+				template: '<center>Order sedang di cetak, silahkan tunggu</center>'
+			}).then(function (res) {
+ 				console.log(res);
+ 				$scope.refresh();
+ 			})
+		}, function (res) {
+ 			$ionicPopup.alert({
+			  title: 'Terjadi Kesalahan',
+			  template: 'order gagal di cetak, silahkan ulangi.'
 			})
  		})
  	}

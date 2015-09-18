@@ -2,10 +2,10 @@ angular
 	.module('eresto.menu.service', [])
 	.factory('MenuService', MenuService)
 
-function MenuService (RestService) {
-	var categories = RestService.all('product_categories');
-	var subCategories = RestService.all('product_sub_categories');
-	var products = RestService.all('products');
+function MenuService (Restangular) {
+	var categories = Restangular.all('product_categories');
+	var subCategories = Restangular.all('product_sub_categories');
+	var products = Restangular.all('products');
 	return {
 		getCategories: getCategories,
 		getSubCategories: getSubCategories,

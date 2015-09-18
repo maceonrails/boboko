@@ -1,9 +1,9 @@
 angular
-  .module('eresto.orderItem.service', ['eresto.rest.service', 'eresto.tax.service'])
+  .module('eresto.orderItem.service', ['eresto.tax.service'])
   .factory('order_itemservice', order_itemservice)
 
-function order_itemservice(RestService, TaxService){
-  base = RestService.all('order_items')
+function order_itemservice(Restangular, TaxService){
+  base = Restangular.all('order_items')
 
   return {
 

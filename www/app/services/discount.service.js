@@ -2,8 +2,8 @@ angular
 	.module('eresto.discount.service', [])
 	.factory('DiscountService', DiscountService)
 
-function DiscountService (RestService) {
-	var discounts = RestService.all("discounts")
+function DiscountService (Restangular) {
+	var discounts = Restangular.all("discounts")
 	return {
 		build: build,
 	}

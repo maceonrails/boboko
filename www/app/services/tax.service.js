@@ -1,16 +1,16 @@
 angular
-	.module('eresto.tax.service', ['eresto.rest.service'])
+	.module('eresto.tax.service', [])
 	.factory('TaxService', TaxService)
 
-function TaxService(RestService, localStorageService){
+function TaxService(Restangular, localStorageService){
   var taxes = {
-    'ppn': 0.1,
-    'service': 0
+    'PPn': 0.1,
+    'Service': 0
   }
 
-  RestService.all("outlets").customGET('get').then(function (res) {
+  Restangular.all("outlets").customGET('get').then(function (res) {
     for (var i in res.outlet.taxs) {
-      taxes[i] = parseFloat(res.outlet.taxs[i])
+      taxes[i] = parseFloat(res.outlet.taxs[i]) / 100
     }
   });
 

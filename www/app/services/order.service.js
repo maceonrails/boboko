@@ -1,9 +1,9 @@
 angular
-  .module('eresto.order.service', ['eresto.rest.service', 'eresto.tax.service'])
+  .module('eresto.order.service', ['eresto.tax.service'])
   .factory('OrderService', OrderService)
 
-function OrderService(RestService, TaxService, $q, AuthService){
-  var base = RestService.all('orders');
+function OrderService(Restangular, TaxService, $q, AuthService){
+  var base = Restangular.all('orders');
   return {
     getWaitingOrders: getWaitingOrders,
     create: create,
@@ -13,6 +13,7 @@ function OrderService(RestService, TaxService, $q, AuthService){
     getActiveItems: getActiveItems,
     payAll: payAll,
     saveOrder: saveOrder,
+    printOrder: printOrder,
     getTotal: getTotal,
     getPaidAmount: getPaidAmount, 
     getReturnAmount: getReturnAmount,
@@ -23,7 +24,7 @@ function OrderService(RestService, TaxService, $q, AuthService){
   }
 
   function addMenu (product, order) {
-    var orderItem = RestService.one('order_items');
+    var orderItem = Restangular.one('order_items');
     orderItem.product_id = product.id;
     orderItem.product = {}
     orderItem.product.choices = product.choices
@@ -123,6 +124,7 @@ function OrderService(RestService, TaxService, $q, AuthService){
       })
       if (!sameItem) {
         splitItem.quantity += splitItem.pay_quantity
+        splitItem.pay_quantity = 0
         order.order_items.push(splitItem)
       }
     })
@@ -139,6 +141,20 @@ function OrderService(RestService, TaxService, $q, AuthService){
 
   function saveOrder (order) {
     return order.post("make_order", order)
+  }
+
+  function printOrder (order, type) {
+    order.order_items.forEach(function (orderItem) {
+      if (type == 'split') {
+        orderItem.print_quantity = orderItem.pay_quantity
+      } else {
+        orderItem.print_quantity = orderItem.quantity - orderItem.paid_quantity
+      }
+    })
+
+    return Restangular.one('orders', order.id).post("make_order", order).then(function (res) {
+      return Restangular.one('orders', order.id).post("print_order", order)
+    })
   }
 
   function calculate (order, discount_amount) {
@@ -194,7 +210,7 @@ function OrderService(RestService, TaxService, $q, AuthService){
   }
 
   function getTax (tax) {
-    return RestService.one('outlets').customGET('get').then(function (res) {
+    return Restangular.one('outlets').customGET('get').then(function (res) {
       result = res.outlet.taxs
       return {
         ppn: result.ppn || 0.1,
@@ -204,16 +220,19 @@ function OrderService(RestService, TaxService, $q, AuthService){
   }
 
   function getTotal (order) {
-    return getSubTotal(order) + getTaxAmount(order);
+    var result = getSubTotal(order) + getTaxAmount(order);
+    return result
   }
 
   function getPaidAmount (order) {
-    return getTotal(order) - order.discount_amount;
+    var result = getTotal(order) - order.discount_amount;
+    return result
   }
 
   function getReturnAmount (order) {
-    paid_amount = getPaidAmount(order)
-    return paid_amount > order.cash_amount ? 0 : order.cash_amount - paid_amount;
+    var paid_amount = getPaidAmount(order)
+    var result = paid_amount > order.cash_amount ? 0 : order.cash_amount - paid_amount;
+    return result
   }
 
   function getWaitingOrders () {
@@ -223,7 +242,7 @@ function OrderService(RestService, TaxService, $q, AuthService){
   }
 
   function create(order) {
-    order.servant_id = AuthService.id();
+    order.cashier_id = AuthService.id();
     return base.post({order: order}).then(function (order) {
       return order;
     });

@@ -1,12 +1,8 @@
 angular
   .module('eresto.auth.service', ['http-auth-interceptor', 'LocalStorageModule'])
   .service('AuthService', AuthService)
-  .factory('AuthInterceptor', AuthInterceptor)
-  .config(function ($httpProvider) {
-    $httpProvider.interceptors.push('AuthInterceptor');
-  });
 
-function AuthService($q, $http, USER_ROLES, localStorageService, RestService, TOKEN_KEY) {
+function AuthService($q, $http, USER_ROLES, localStorageService, Restangular, TOKEN_KEY) {
   var username = '';
   var name = '';
   var id = '';
@@ -51,7 +47,7 @@ function AuthService($q, $http, USER_ROLES, localStorageService, RestService, TO
     return $q(function(resolve, reject) {
       if (user.email && user.password) {
         // Make a request and receive your auth token from your server
-        RestService.all('sessions').post({ user: user }).then(function (data) {
+        Restangular.all('sessions').post({ user: user }).then(function (data) {
           // $http.defaults.headers.common.Authorization = data.token;  // Step 1
           // A more secure approach would be to store the token in SharedPreferences for Android, and Keychain for iOS
           if (data.role == 'cashier') {
@@ -84,7 +80,7 @@ function AuthService($q, $http, USER_ROLES, localStorageService, RestService, TO
   loadUserCredentials();
 
   var authorizeUser = function(user) {
-    return RestService.all('users').customPOST(user, 'authorize_for_discount')
+    return Restangular.all('users').customPOST(user, 'authorize_for_discount')
   }
 
   return {
@@ -100,24 +96,3 @@ function AuthService($q, $http, USER_ROLES, localStorageService, RestService, TO
   };
 }
 
-function AuthInterceptor($rootScope, $q, AUTH_EVENTS, TOKEN_KEY, localStorageService) {
-  return {
-    responseError: function (response) {
-      $rootScope.$broadcast({
-        400: AUTH_EVENTS.badRequest,
-        401: AUTH_EVENTS.notAuthenticated,
-        403: AUTH_EVENTS.notAuthorized,
-        // 404: AUTH_EVENTS.badRequest
-      }[response.status], response);
-      return $q.reject(response);
-    }, 
-    request: function(config) {
-      if(!config.params) {
-        config.params = {};
-      }
-      
-      config.params.token = localStorageService.get(TOKEN_KEY);
-      return config || $q.when(config);
-    }
-  };
-}
