@@ -1,6 +1,6 @@
 {
   "name": "eresto-cashier",
-  "app_id": "",
+  "app_id": "2dac8183",
   "gulpStartupTasks": [
     "sass",
     "watch"
