@@ -3,7 +3,6 @@ angular
 	.controller('DashboardCtrl', DashboardCtrl)
 
 function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, localStorageService, tables, orders){
-	debugger
 	$scope.tables = tables
 	$rootScope.orders = orders;
 	$rootScope.init = init;

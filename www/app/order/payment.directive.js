@@ -70,48 +70,6 @@ function erestoPayment(){
 					title: 'Kesalahan',
 					template: 'Discount lebih besar dari jumlah transaksi.'
 				})
-	 		} else if (order.discount_amount > 0) {
-	 			$scope.user = {};
-	 			$ionicPopup.show({
-			   	templateUrl: 'app/order/discount-form.html',
-			   	title: 'Need verification for discount',
-			   	subTitle: 'Please input email and password',
-			   	scope: $scope,
-			   	buttons: [
-			     	{ text: 'Cancel' },
-			     	{
-			       	text: '<b>Verify</b>',
-			       	type: 'button-positive',
-			       	onTap: function(e) {
-			         	AuthService.authorizeUser($scope.user).then(function (res) {
-			         		order.discount_by = res.user.id
-					 				PaymentService.payOrder(order, order_items).then(function (order) {
-						 				$ionicPopup.alert({
-											title: 'Pembayaran berhasil',
-											scope: $scope,
-											template: '<center>Kembali:<br><br> <b>{{getReturnAmount(order) | currency: "Rp "}}</b> </center>'
-										}).then(function (res) {
-							 				console.log(res);
-							 				$state.go('main.dashboard');
-							 			})
-						 			}, function (order) {
-							 			$ionicPopup.alert({
-										  title: 'Kesalahan',
-										  template: 'Pembayaran gagal, silahkan ulangi.'
-										}).then(function(res) {	 
-							 				console.log(res);
-							 			})
-							 		})
-					 			}, function (res) {
-						 			$ionicPopup.alert({
-									  title: 'Kesalahan',
-									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
-									})
-						 		})
-			       	}
-			     	},
-			   	]
-			 	});
 	 		} else {
  				PaymentService.payOrder(order, order_items).then(function (order) {
 	 				$ionicPopup.alert({

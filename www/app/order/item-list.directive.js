@@ -32,7 +32,7 @@ function erestoItemList(OrderService, TaxService){
 		function clickItem (orderItem) {
 
 			if ($scope.$root.show == 'move') {
-				if ($scope.order.type == 'split') {
+				if ($scope.order.type == 'move') {
 					moveFromBox(orderItem)
 				} else {
 					moveToBox(orderItem)
@@ -42,12 +42,12 @@ function erestoItemList(OrderService, TaxService){
 			}
 		}
 
-		function moveToBox (orderItem, fromOrder, moveOrder) {
-			OrderService.moveToBox(orderItem, order, move_order)
+		function moveToBox (orderItem) {
+			OrderService.moveToBox(orderItem, $scope.$parent.order, $scope.$parent.move_order)
 		}
 
-		function moveFromBox (argument) {
-			OrderService.moveFromBox(orderItem, move_order, order)
+		function moveFromBox (orderItem) {
+			OrderService.moveFromBox(orderItem, $scope.$parent.move_order, $scope.$parent.order)
 		}
 
 		function showItemDetail (orderItem) {

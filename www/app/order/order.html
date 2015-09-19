@@ -16,23 +16,23 @@
 				</div>
 				<ul class="transactional-buttons-container" ng-hide="show == 'split'">
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-move" href="#" ng-click="showItemBox()"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-move" ng-click="showItemBox()"></a>
 						<p>Move</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="addDiscountAmount(order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" ng-click="addDiscountAmount(order)"></a>
 						<p>Diskon Rp</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-diskon-persen" href="#" ng-click="addPercentDiscount(order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-diskon-persen" ng-click="addPercentDiscount(order)"></a>
 						<p>Diskon %</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-save" href="#" ng-click="saveOrder(order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-save" ng-click="saveOrder(order)"></a>
 						<p>Save</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="printOrder(order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-print" ng-click="printOrder(order)"></a>
 						<p>Print</p>
 					</li>
 					<li>
@@ -51,11 +51,11 @@
 				</div>
 				<ul class="transactional-buttons-container">
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-cancel" href="#" ng-click="cancelSplit(order, split_order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-cancel" ng-click="cancelSplit(order, split_order)"></a>
 						<p>Cancel</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="printSplitOrder(split_order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-print" ng-click="printSplitOrder(split_order)"></a>
 						<p>Print</p>
 					</li>
 					<li>
@@ -66,28 +66,28 @@
 			</div>
 			<div class="right-container cf">
 				<div class="choose-menu-container" eresto-menu ng-show="show=='menu'"></div>
-				<div class="left-inner-container"  ng-show="show=='split'">
+				<div class="left-inner-container"  ng-show="show=='move'">
 					<div class="order-table-properties">
-						<h2 class="order-table-number">Split Order</h2>
+						<h2 class="order-table-number">Move Order</h2>
 						<h3 class="order-table-customer">{{order.name}}</h3>
 					</div>
-					<eresto-item-list order="split_order"> </eresto-item-list>
+					<eresto-item-list order="move_order" base_order="order"> </eresto-item-list>
 				</div>
 				<ul class="transactional-buttons-container" ng-show="show=='move'">
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-cancel" href="#" ng-click="cancelMove(order, move_order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-cancel" ng-click="cancelMove(order, move_order)"></a>
 						<p>Cancel</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, move_order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-void" ng-click="voidOrder(order, move_order)"></a>
 						<p>Void</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-oc" href="#" ng-click="ocOrder(order, move_order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-oc" ng-click="ocOrder(order, move_order)"></a>
 						<p>Opr Cost</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-split" href="#" ng-click="splitOrder(order, move_order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-split" ng-click="splitOrder(order, move_order)"></a>
 						<p>Bayar Pisah</p>
 					</li>
 				</ul>

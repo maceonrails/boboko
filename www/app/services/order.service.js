@@ -18,10 +18,12 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     getPaidAmount: getPaidAmount, 
     getReturnAmount: getReturnAmount,
     addMenu: addMenu, 
-    moveFromSplit: moveFromSplit,
-    moveToSplit: moveToSplit,
-    cancelSplit: cancelSplit,
-    voidOrder: voidOrder
+    moveFromBox: moveFromBox,
+    moveToBox: moveToBox,
+    // cancelSplit: cancelSplit,
+    cancelMove: cancelMove,
+    voidOrder: voidOrder,
+    ocOrder: ocOrder
   }
 
   function addMenu (product, order) {
@@ -62,7 +64,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     var sameItem = false
     move_order.order_items.forEach(function (orderItem) {
       if (orderItem === item) {
-        item.move_quantity++
+        item.pay_quantity++
         item.quantity--
         if (item.quantity == 0) {
           _.remove(order.order_items, {
@@ -74,7 +76,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     })
     if (!sameItem) {
       item.quantity--
-      item.move_quantity++
+      item.pay_quantity++
       move_order.order_items.push(item)
       console.log('move to box', item)
       if (item.quantity == 0) {
@@ -89,10 +91,10 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     var sameItem = false
     order.order_items.forEach(function (orderItem) {
       if (orderItem === item) {
-        item.move_quantity--
+        item.pay_quantity--
         item.quantity++
         console.log('move to box same item', item)
-        if (item.move_quantity == 0) {
+        if (item.pay_quantity == 0) {
           _.remove(move_order.order_items, {
             product_id: item.product_id
           });
@@ -102,10 +104,10 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     })
     if (!sameItem) {
       item.quantity++
-      item.move_quantity--
+      item.pay_quantity--
       order.order_items.push(item)
       console.log('move from split', item)
-      if (item.move_quantity == 0) {
+      if (item.pay_quantity == 0) {
         _.remove(move_order.order_items, {
           product_id: item.product_id
         });
@@ -118,14 +120,14 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     move_order.order_items.forEach(function (item) {
       order.order_items.forEach(function (orderItem) {
         if (item === orderItem) {
-          orderItem.quantity += orderItem.move_quantity
-          orderItem.move_quantity = 0
+          orderItem.quantity += orderItem.pay_quantity
+          orderItem.pay_quantity = 0
           sameItem = true
         }
       })
       if (!sameItem) {
-        item.quantity += item.move_quantity
-        item.move_quantity = 0
+        item.quantity += item.pay_quantity
+        item.pay_quantity = 0
         order.order_items.push(item)
       }
     })

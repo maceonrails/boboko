@@ -12,7 +12,7 @@ function PaymentService ($q, Restangular, OrderService, TaxService) {
 
 	return {
 		payOrder: payOrder,
-		voidOrder: voidOrder, 
+		// voidOrder: voidOrder, 
 		voidItem: voidItem, 
 		getPaymentInfo: getPaymentInfo
 	}

@@ -2,7 +2,7 @@ angular
 	.module('eresto.order', [])
 	.controller('OrderCtrl', OrderCtrl)
 
-function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ionicPopup, PaymentService){
+function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ionicPopup, PaymentService, AuthService){
 	$scope.showMenu = showMenu;
 	$scope.hideMenu = hideMenu;
 	$scope.showCalculator = showCalculator;
@@ -36,8 +36,9 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$scope.split_order.discount_amount = 0
 	$scope.split_order.cash_amount = 0
 
+	$scope.move_order = {};
 	$scope.move_order.order_items = []
-	$scope.move_order.type = ''
+	$scope.move_order.type = 'move'
 	$scope.move_order.id = $stateParams.id
 	$scope.move_order.discount_amount = 0
 	$scope.move_order.cash_amount = 0
@@ -106,54 +107,70 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 		$rootScope.show = 'calculator'
 	}
 
- 	function addDiscountAmount (order) {
- 		$scope.discount = {}
- 		$scope.order = order
-	 	$ionicPopup.show({
-	   	template: '<input type="text" ng-model="discount.amount">',
-	   	title: 'Add Amount Discount',
-	   	subTitle: 'Please input Amount discount',
+	function addDiscount (order, discount) {
+			$scope.order = order;
+			$scope.user = {};
+			$scope.discount = discount;
+			$ionicPopup.show({
+	   	templateUrl: 'app/order/discount-form.html',
+	   	title: 'Need verification for discount',
+	   	subTitle: 'Please input email and password',
 	   	scope: $scope,
 	   	buttons: [
-	     	{ text: 'Cancel' },
+	     	{ 
+	     		text: 'Cancel'
+	     	},
 	     	{
-	       	text: '<b>Gift</b>',
+	       	text: '<b>Verify</b>',
 	       	type: 'button-positive',
 	       	onTap: function(e) {
-	       		console.log(order)
-	         	if (!$scope.discount.amount || $scope.discount.amount > OrderService.getSubTotal($scope.order)) {
-	           	e.preventDefault();
-	         	} else {
-	         		$scope.order.discount_amount = $scope.discount.amount;
+	       		if (!$scope.user.email || !$scope.user.password) {
+	       			e.preventDefault();
+	       		}
+	       		else if (discount.type == 'percent') {
+		       		if (!$scope.discount.percent || $scope.discount.percent > 100 || $scope.discount.percent < 0) {
+		           	e.preventDefault();
+		         	} else {
+								AuthService.authorizeUserForDiscount($scope.user).then(function (res) {
+			         		order.discount_by = res.user.id
+									order.discount_amount = ($scope.discount.percent / 100) * OrderService.getSubTotal(order);
+					 			}, function (res) {
+					 				$scope.order.discount_amount = 0
+						 			$ionicPopup.alert({
+									  title: 'Kesalahan',
+									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
+									})
+						 		})
+							}
+	         	}
+	       		else {
+	       			if (!$scope.discount.amount || $scope.discount.amount > OrderService.getSubTotal($scope.order)) {
+		           	e.preventDefault();
+		         	} else {
+		         		AuthService.authorizeUserForDiscount($scope.user).then(function (res) {
+			         		order.discount_by = res.user.id
+			         		order.discount_amount = $scope.discount.amount
+					 			}, function (res) {
+					 				$scope.order.discount_amount = 0
+						 			$ionicPopup.alert({
+									  title: 'Kesalahan',
+									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
+									})
+						 		})
+		         	}
 	         	}
 	       	}
 	     	},
 	   	]
 	 	});
+	}
+
+ 	function addDiscountAmount (order) {
+ 		addDiscount(order, { type: 'amount' })
  	}
 
  	function addPercentDiscount (order) {
- 		$scope.discount = {};
-	 	$ionicPopup.show({
-	   	template: '<input type="text" ng-model="discount.percent">',
-	   	title: 'Add percent Discount',
-	   	subTitle: 'Please input percent Discount (0 - 100)',
-	   	scope: $scope,
-	   	buttons: [
-	     	{ text: 'Cancel' },
-	     	{
-	       	text: '<b>Gift</b>',
-	       	type: 'button-positive',
-	       	onTap: function(e) {
-	         	if (!$scope.discount.percent || $scope.discount.percent > 100 || $scope.discount.percent < 0) {
-	           	e.preventDefault();
-	         	} else {
-							order.discount_amount = ($scope.discount.percent / 100) * OrderService.getSubTotal(order);
-	         	}
-	       	}
-	     	},
-	   	]
-	 	});
+ 		addDiscount(order, { type: 'percent' })
  	}
 
  	function ocOrder (order) {

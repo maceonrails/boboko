@@ -10,11 +10,13 @@
 	<tbody>
 		<tr ng-click="clickItem(orderItem)" ng-repeat="orderItem in order.order_items">
 			<td width="52%">{{orderItem.name}}</td>
-			<td width="8%" ng-hide="order.type == 'split'">{{orderItem.quantity - orderItem.paid_quantity}}</td>
-			<td width="8%" ng-show="order.type == 'split'">{{orderItem.move_quantity}}</td>
+			<td width="8%" ng-hide="order.type == 'move'">
+				{{orderItem.quantity - orderItem.paid_quantity - orderItem.void_quantity - orderItem.oc_quantity}}
+			</td>
+			<td width="8%" ng-show="order.type == 'move'">{{orderItem.pay_quantity}}</td>
 			<td width="20%">{{orderItem.price | currency:"Rp "}}</td>
-			<td width="20%" ng-hide="order.type == 'split'">{{orderItem.price * orderItem.quantity | currency:"Rp "}}</td>
-			<td width="20%" ng-show="order.type == 'split'">{{orderItem.price * orderItem.move_quantity | currency:"Rp "}}</td>
+			<td width="20%" ng-hide="order.type == 'move'">{{orderItem.price * orderItem.quantity | currency:"Rp "}}</td>
+			<td width="20%" ng-show="order.type == 'move'">{{orderItem.price * orderItem.pay_quantity | currency:"Rp "}}</td>
 		</tr>
 	</tbody>
 </table>
