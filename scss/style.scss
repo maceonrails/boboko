@@ -614,6 +614,16 @@ a.btn-transaction-cancel:after {
 	font-size: 21px;
 }
 
+a.btn-transaction-oc:after {
+	content: "OC";
+	font-size: 21px;
+}
+
+a.btn-transaction-move:after {
+	content: "Move";
+	font-size: 21px;
+}
+
 
 
 div.right-container {

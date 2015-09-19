@@ -20,7 +20,8 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     addMenu: addMenu, 
     moveFromSplit: moveFromSplit,
     moveToSplit: moveToSplit,
-    cancelSplit: cancelSplit
+    cancelSplit: cancelSplit,
+    voidOrder: voidOrder
   }
 
   function addMenu (product, order) {
@@ -57,11 +58,11 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     return order;
   }
 
-  function moveToSplit (item, order, split_order) {
+  function moveToBox (item, order, move_order) {
     var sameItem = false
-    split_order.order_items.forEach(function (orderItem) {
+    move_order.order_items.forEach(function (orderItem) {
       if (orderItem === item) {
-        item.pay_quantity++
+        item.move_quantity++
         item.quantity--
         if (item.quantity == 0) {
           _.remove(order.order_items, {
@@ -73,9 +74,9 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     })
     if (!sameItem) {
       item.quantity--
-      item.pay_quantity++
-      split_order.order_items.push(item)
-      console.log('move to split', item)
+      item.move_quantity++
+      move_order.order_items.push(item)
+      console.log('move to box', item)
       if (item.quantity == 0) {
         _.remove(order.order_items, {
           product_id: item.product_id
@@ -84,15 +85,15 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     }
   }
 
-  function moveFromSplit (item, split_order, order) {
+  function moveFromBox (item, move_order, order) {
     var sameItem = false
     order.order_items.forEach(function (orderItem) {
       if (orderItem === item) {
-        item.pay_quantity--
+        item.move_quantity--
         item.quantity++
-        console.log('move to split same item', item)
-        if (item.pay_quantity == 0) {
-          _.remove(split_order.order_items, {
+        console.log('move to box same item', item)
+        if (item.move_quantity == 0) {
+          _.remove(move_order.order_items, {
             product_id: item.product_id
           });
         }
@@ -101,34 +102,34 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     })
     if (!sameItem) {
       item.quantity++
-      item.pay_quantity--
+      item.move_quantity--
       order.order_items.push(item)
       console.log('move from split', item)
-      if (item.pay_quantity == 0) {
-        _.remove(split_order.order_items, {
+      if (item.move_quantity == 0) {
+        _.remove(move_order.order_items, {
           product_id: item.product_id
         });
       }
     }
   }
 
-  function cancelSplit (order, split_order) {
+  function cancelMove (order, move_order) {
     var sameItem = false
-    split_order.order_items.forEach(function (splitItem) {
+    move_order.order_items.forEach(function (item) {
       order.order_items.forEach(function (orderItem) {
-        if (splitItem === orderItem) {
-          orderItem.quantity += orderItem.pay_quantity
-          orderItem.pay_quantity = 0
+        if (item === orderItem) {
+          orderItem.quantity += orderItem.move_quantity
+          orderItem.move_quantity = 0
           sameItem = true
         }
       })
       if (!sameItem) {
-        splitItem.quantity += splitItem.pay_quantity
-        splitItem.pay_quantity = 0
-        order.order_items.push(splitItem)
+        item.quantity += item.move_quantity
+        item.move_quantity = 0
+        order.order_items.push(item)
       }
     })
-    split_order.order_items = [];
+    move_order.order_items = [];
   }
 
   function moveItem (item, fromOrder, toOrder) {
@@ -143,15 +144,21 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     return order.post("make_order", order)
   }
 
-  function printOrder (order, type) {
+  function printOrder (order) {
     order.order_items.forEach(function (orderItem) {
-      if (type == 'split') {
-        orderItem.print_quantity = orderItem.pay_quantity
-      } else {
-        orderItem.print_quantity = orderItem.quantity - orderItem.paid_quantity
-      }
+      orderItem.print_quantity = orderItem.quantity - orderItem.paid_quantity
     })
+    return saveAndPrint(order)
+  }
 
+  function printSplitOrder (order) {
+    order.order_items.forEach(function (orderItem) {
+      orderItem.print_quantity = orderItem.pay_quantity
+    })
+    return saveAndPrint(order)
+  }
+
+  function saveAndPrint (order) {
     return Restangular.one('orders', order.id).post("make_order", order).then(function (res) {
       return Restangular.one('orders', order.id).post("print_order", order)
     })
@@ -276,4 +283,21 @@ function OrderService(Restangular, TaxService, $q, AuthService){
       return error;
     })
   }
+
+  function voidOrder (order, user) {
+    return Restangular.one('orders', order.id).post(
+      "void_order", 
+      {order_items: order.order_items}, 
+      {order_id: order.id, email: user.email, password: user.password, note: user.note}
+    )
+  }
+
+  function ocOrder (order, user) {
+    return Restangular.one('orders', order.id).post(
+      "oc_order", 
+      {order_items: order.order_items}, 
+      {order_id: order.id, email: user.email, password: user.password, note: user.note}
+    )
+  }
+
 }

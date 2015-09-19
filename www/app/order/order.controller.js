@@ -7,9 +7,13 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$scope.hideMenu = hideMenu;
 	$scope.showCalculator = showCalculator;
 	$scope.showSplit = showSplit;
+	$scope.showItemBox = showItemBox;
 	$scope.voidOrder = voidOrder;
+	$scope.ocOrder = ocOrder;
 	$scope.saveOrder = saveOrder;
 	$scope.printOrder = printOrder;
+	$scope.printSplitOrder = printSplitOrder;
+	$scope.cancelMove = cancelMove;
 	$scope.cancelSplit = cancelSplit;
 	$scope.removeOrder = removeOrder;
 	$scope.orderHeader = orderHeader;
@@ -31,6 +35,12 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$scope.split_order.id = $stateParams.id
 	$scope.split_order.discount_amount = 0
 	$scope.split_order.cash_amount = 0
+
+	$scope.move_order.order_items = []
+	$scope.move_order.type = ''
+	$scope.move_order.id = $stateParams.id
+	$scope.move_order.discount_amount = 0
+	$scope.move_order.cash_amount = 0
 
 	$scope.order.subTotal = 0
 	$scope.order.taxAmount = 0
@@ -82,6 +92,14 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	function showSplit() {
 		$rootScope.show = 'split';
 	};
+
+	function showItemBox() {
+		$rootScope.show = 'move';
+	};
+
+	function cancelMove (order, move_order) {
+		OrderService.cancelMove(order, move_order)
+	}
 
 	function cancelSplit (order, split_order) {
 		OrderService.cancelSplit(order, split_order)
@@ -138,7 +156,43 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	 	});
  	}
 
- 	function voidOrder (order, order_items) {
+ 	function ocOrder (order) {
+ 		$scope.order.note = '';
+ 		$scope.user = {};
+	 	$ionicPopup.show({
+	   	templateUrl: 'app/order/void-form.html',
+	   	title: 'Void Order',
+	   	subTitle: 'Please input reason',
+	   	scope: $scope,
+	   	buttons: [
+	     	{ text: 'Cancel' },
+	     	{
+	       	text: '<b>Gift</b>',
+	       	type: 'button-positive',
+	       	onTap: function(e) {
+	         	OrderService.ocOrder(order, $scope.user).then(function (res) {
+			 				$ionicPopup.alert({
+								title: 'Void Sukses',
+								scope: $scope,
+								template: '<center>Reason:<br><br> <b>{{ void.note }}</b> </center>'
+							}).then(function (res) {
+				 				console.log(res);
+				 				$state.go('main.dashboard');
+				 			})
+			 			}, function (res) {
+				 			$ionicPopup.alert({
+							  title: 'Kesalahan',
+							  template: 'Void gagal, silahkan ulangi.'
+							})
+				 		})
+	       	}
+	     	},
+	   	]
+	 	});
+ 	}
+
+ 	function voidOrder (order) {
+
  		$scope.void = {};
  		$scope.user = {};
 	 	$ionicPopup.show({
@@ -152,13 +206,11 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	       	text: '<b>Gift</b>',
 	       	type: 'button-positive',
 	       	onTap: function(e) {
-	         	order.void_note = $scope.void.note;
-
-	         	PaymentService.voidOrder(order, $scope.user, order_items).then(function (res) {
+	         	OrderService.voidOrder(order, $scope.user).then(function (res) {
 			 				$ionicPopup.alert({
 								title: 'Void Sukses',
 								scope: $scope,
-								template: '<center>Reason:<br><br> <b>{{ void.note }}</b> </center>'
+								template: '<center>Reason:<br><br> <b>{{ $scope.user.note }}</b> </center>'
 							}).then(function (res) {
 				 				console.log(res);
 				 				$state.go('main.dashboard');
@@ -216,23 +268,31 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
  		})
  	}
 
- 	function printOrder (order, type) {
- 		OrderService.printOrder(order, type).then(function (res) {
-			$ionicPopup.alert({
-				title: 'Print Order',
-				scope: $scope,
-				template: '<center>Order sedang di cetak, silahkan tunggu</center>'
-			}).then(function (res) {
- 				console.log(res);
- 				$scope.refresh();
- 			})
-		}, function (res) {
- 			$ionicPopup.alert({
-			  title: 'Terjadi Kesalahan',
-			  template: 'order gagal di cetak, silahkan ulangi.'
-			})
- 		})
+ 	function printSplitOrder (order) {
+ 		OrderService.printSplitOrder(order).then(printCallback, printFailCallback)
  	}
+
+ 	function printOrder (order) {
+ 		OrderService.printOrder(order).then(printSuccessCallback, printFailCallback)
+ 	}
+
+ 	function printSuccessCallback(res) {
+		$ionicPopup.alert({
+			title: 'Print Order',
+			scope: $scope,
+			template: '<center>Order sedang di cetak, silahkan tunggu</center>'
+		}).then(function (res) {
+			console.log(res);
+			$scope.refresh();
+		})
+	}
+
+	function printFailCallback (res) {
+		$ionicPopup.alert({
+		  title: 'Terjadi Kesalahan',
+		  template: 'order gagal di cetak, silahkan ulangi.'
+		})
+	}
  	
 
 }

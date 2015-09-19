@@ -65,15 +65,6 @@ function PaymentService ($q, Restangular, OrderService, TaxService) {
 		return Restangular.one('orders', order.id).post("pay_order", order)
 	}
 
-	function voidOrder (order, user, order_items) {
-		order_items.forEach(function (orderItem) {
-			orderItem.paid_amount = 0;
-			orderItem.void = true;
-			orderItem.void_note = order.void_note;
-		})
-		return order.post("void_order", {order_items: order_items}, {order_id: order.id, email: user.email, password: user.password});
-	}
-
 	function voidItem (orderItem) {
 		return Restangular.one('orders', orderItem.order_id).post("void_item", {order_item: orderItem})
 	}

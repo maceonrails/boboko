@@ -16,12 +16,8 @@
 				</div>
 				<ul class="transactional-buttons-container" ng-hide="show == 'split'">
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, order.order_items)"></a>
-						<p>Void</p>
-					</li>
-					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-split" href="#" ng-click="showSplit()"></a>
-						<p>Bayar Pisah</p>
+						<a class="btn-rounded btn-secondary btn-transaction-move" href="#" ng-click="showItemBox()"></a>
+						<p>Move</p>
 					</li>
 					<li>
 						<a class="btn-rounded btn-secondary btn-transaction-diskon-rp" href="#" ng-click="addDiscountAmount(order)"></a>
@@ -51,7 +47,7 @@
 						<h2 class="order-table-number">Split Order</h2>
 						<h3 class="order-table-customer">{{order.name}}</h3>
 					</div>
-					<eresto-item-list order="split_order"> </eresto-item-list>
+					<eresto-item-list order="move_order" base_order="order"> </eresto-item-list>
 				</div>
 				<ul class="transactional-buttons-container">
 					<li>
@@ -59,7 +55,7 @@
 						<p>Cancel</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="printOrder(split_order, 'split')"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="printSplitOrder(split_order)"></a>
 						<p>Print</p>
 					</li>
 					<li>
@@ -77,18 +73,22 @@
 					</div>
 					<eresto-item-list order="split_order"> </eresto-item-list>
 				</div>
-				<ul class="transactional-buttons-container" ng-show="show=='split'">
+				<ul class="transactional-buttons-container" ng-show="show=='move'">
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-cancel" href="#" ng-click="cancelSplit(order, split_order)"></a>
+						<a class="btn-rounded btn-secondary btn-transaction-cancel" href="#" ng-click="cancelMove(order, move_order)"></a>
 						<p>Cancel</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-secondary btn-transaction-print" href="#" ng-click="printOrder(split_order, 'split')"></a>
-						<p>Print</p>
+						<a class="btn-rounded btn-secondary btn-transaction-void" href="#" ng-click="voidOrder(order, move_order)"></a>
+						<p>Void</p>
 					</li>
 					<li>
-						<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator(split_order)"></a>
-						<p>Pembayaran</p>
+						<a class="btn-rounded btn-secondary btn-transaction-oc" href="#" ng-click="ocOrder(order, move_order)"></a>
+						<p>Opr Cost</p>
+					</li>
+					<li>
+						<a class="btn-rounded btn-secondary btn-transaction-split" href="#" ng-click="splitOrder(order, move_order)"></a>
+						<p>Bayar Pisah</p>
 					</li>
 				</ul>
 				<div class="calculator-container" eresto-payment order="order" ng-show="show=='orderCalculator'"></div>

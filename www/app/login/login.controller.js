@@ -38,8 +38,8 @@ function LoginCtrl($scope, $http, $state, localStorageService, $rootScope, AuthS
 
   function login(data) {
     AuthService.login(data).then(function(authenticated) {
-      $state.go('main.dashboard', {}, {reload: true});
-      $scope.setCurrentUsername(localStorageService.get('name'));
+    	$scope.setCurrentUsername(localStorageService.get('name'));
+      $state.go('main.dashboard');
     }, function(err) {
       $ionicPopup.alert({
         title: 'Login failed!',

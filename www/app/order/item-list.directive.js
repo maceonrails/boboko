@@ -8,7 +8,7 @@ function erestoItemList(OrderService, TaxService){
 		// name: '',
 		// priority: 1,
 		// terminal: true,
-		scope: { order: "=", name: "=" }, // {} = isolate, true = child, false/undefined = no change
+		scope: { order: "=", name: "=", base_order: "=" }, // {} = isolate, true = child, false/undefined = no change
 		controller: controller,
 		// require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
 		restrict: 'EA', // E = Element, A = Attribute, C = Class, M = Comment
@@ -31,27 +31,23 @@ function erestoItemList(OrderService, TaxService){
 
 		function clickItem (orderItem) {
 
-			if ($scope.$root.show == 'split') {
+			if ($scope.$root.show == 'move') {
 				if ($scope.order.type == 'split') {
-					moveFromSplit(orderItem)
+					moveFromBox(orderItem)
 				} else {
-					moveToSplit(orderItem)
+					moveToBox(orderItem)
 				}
 			} else {
 				showItemDetail(orderItem)
 			}
 		}
 
-		function moveToSplit (orderItem) {
-			var split_order = $scope.$parent.split_order
-			var order = $scope.$parent.order
-			OrderService.moveToSplit(orderItem, order, split_order)
+		function moveToBox (orderItem, fromOrder, moveOrder) {
+			OrderService.moveToBox(orderItem, order, move_order)
 		}
 
-		function moveFromSplit (orderItem) {
-			var split_order = $scope.$parent.split_order
-			var order = $scope.$parent.order
-			OrderService.moveFromSplit(orderItem, split_order, order)
+		function moveFromBox (argument) {
+			OrderService.moveFromBox(orderItem, move_order, order)
 		}
 
 		function showItemDetail (orderItem) {

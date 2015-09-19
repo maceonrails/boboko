@@ -30,6 +30,7 @@ function AppCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, localSto
   });
  
   $scope.$on(AUTH_EVENTS.notAuthenticated, function(event) {
+  	debugger
     AuthService.logout();
     $state.go('login');
     var alertPopup = $ionicPopup.alert({
