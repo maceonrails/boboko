@@ -88,54 +88,70 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 		$rootScope.show = 'calculator'
 	}
 
- 	function addDiscountAmount (order) {
- 		$scope.discount = {}
- 		$scope.order = order
-	 	$ionicPopup.show({
-	   	template: '<input type="text" ng-model="discount.amount">',
-	   	title: 'Add Amount Discount',
-	   	subTitle: 'Please input Amount discount',
+ 	function addDiscount (order, discount) {
+			$scope.order = order;
+			$scope.user = {};
+			$scope.discount = discount;
+			$ionicPopup.show({
+	   	templateUrl: 'app/order/discount-form.html',
+	   	title: 'Need verification for discount',
+	   	subTitle: 'Please input email and password',
 	   	scope: $scope,
 	   	buttons: [
-	     	{ text: 'Cancel' },
+	     	{ 
+	     		text: 'Cancel'
+	     	},
 	     	{
-	       	text: '<b>Gift</b>',
+	       	text: '<b>Verify</b>',
 	       	type: 'button-positive',
 	       	onTap: function(e) {
-	       		console.log(order)
-	         	if (!$scope.discount.amount || $scope.discount.amount > OrderService.getSubTotal($scope.order)) {
-	           	e.preventDefault();
-	         	} else {
-	         		$scope.order.discount_amount = $scope.discount.amount;
+	       		if (!$scope.user.email || !$scope.user.password) {
+	       			e.preventDefault();
+	       		}
+	       		else if (discount.type == 'percent') {
+		       		if (!$scope.discount.percent || $scope.discount.percent > 100 || $scope.discount.percent < 0) {
+		           	e.preventDefault();
+		         	} else {
+								AuthService.authorizeUserForDiscount($scope.user).then(function (res) {
+			         		order.discount_by = res.user.id
+									order.discount_amount = ($scope.discount.percent / 100) * OrderService.getSubTotal(order);
+					 			}, function (res) {
+					 				$scope.order.discount_amount = 0
+						 			$ionicPopup.alert({
+									  title: 'Kesalahan',
+									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
+									})
+						 		})
+							}
+	         	}
+	       		else {
+	       			if (!$scope.discount.amount || $scope.discount.amount > OrderService.getSubTotal($scope.order)) {
+		           	e.preventDefault();
+		         	} else {
+		         		AuthService.authorizeUserForDiscount($scope.user).then(function (res) {
+			         		order.discount_by = res.user.id
+			         		order.discount_amount = $scope.discount.amount
+					 			}, function (res) {
+					 				$scope.order.discount_amount = 0
+						 			$ionicPopup.alert({
+									  title: 'Kesalahan',
+									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
+									})
+						 		})
+		         	}
 	         	}
 	       	}
 	     	},
 	   	]
 	 	});
+	}
+
+ 	function addDiscountAmount (order) {
+ 		addDiscount(order, { type: 'amount' })
  	}
 
  	function addPercentDiscount (order) {
- 		$scope.discount = {};
-	 	$ionicPopup.show({
-	   	template: '<input type="text" ng-model="discount.percent">',
-	   	title: 'Add percent Discount',
-	   	subTitle: 'Please input percent Discount (0 - 100)',
-	   	scope: $scope,
-	   	buttons: [
-	     	{ text: 'Cancel' },
-	     	{
-	       	text: '<b>Gift</b>',
-	       	type: 'button-positive',
-	       	onTap: function(e) {
-	         	if (!$scope.discount.percent || $scope.discount.percent > 100 || $scope.discount.percent < 0) {
-	           	e.preventDefault();
-	         	} else {
-							order.discount_amount = ($scope.discount.percent / 100) * OrderService.getSubTotal(order);
-	         	}
-	       	}
-	     	},
-	   	]
-	 	});
+ 		addDiscount(order, { type: 'percent' })
  	}
 
  	function voidOrder (order, order_items) {
