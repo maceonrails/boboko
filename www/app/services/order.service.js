@@ -14,6 +14,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     payAll: payAll,
     saveOrder: saveOrder,
     printOrder: printOrder,
+    printSplitOrder: printSplitOrder,
     getTotal: getTotal,
     getPaidAmount: getPaidAmount, 
     getReturnAmount: getReturnAmount,
@@ -39,6 +40,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     orderItem.pay_quantity = 0;
     orderItem.paid_quantity = 0;
     orderItem.printed_quantity = 0;
+    orderItem.take_away = true;
     orderItem.paid_amount = orderItem.quantity * product.price;
     var sameItem = false;
 
@@ -85,6 +87,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
         });
       }
     }
+    console.log(item.pay_quantity)
   }
 
   function moveFromBox (item, move_order, order) {
@@ -113,6 +116,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
         });
       }
     }
+    console.log(item.pay_quantity)
   }
 
   function cancelMove (order, move_order) {
@@ -143,6 +147,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
   }
 
   function saveOrder (order) {
+    order.cashier_id = AuthService.id();
     return order.post("make_order", order)
   }
 
@@ -161,6 +166,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
   }
 
   function saveAndPrint (order) {
+    order.cashier_id = AuthService.id();
     return Restangular.one('orders', order.id).post("make_order", order).then(function (res) {
       return Restangular.one('orders', order.id).post("print_order", order)
     })
@@ -190,7 +196,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     var sub_total = 0
     order.order_items.forEach(function(orderItem) {
       if (orderItem.product_id)
-        if (order.type === 'split')
+        if (order.type === 'move')
           sub_total += orderItem.pay_quantity * orderItem.price;
         else if (order.type === 'void')
           sub_total += orderItem.void_quantity * orderItem.price;
@@ -204,7 +210,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
 
   function getItemSubTotal (order, orderItem) {
     if (orderItem.product_id)
-      if (order.type === 'split')
+      if (order.type === 'move')
         return orderItem.pay_quantity * orderItem.price;
       else if (order.type === 'void')
         return orderItem.void_quantity * orderItem.price;
@@ -252,6 +258,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
 
   function create(order) {
     order.cashier_id = AuthService.id();
+    order.servant_id = AuthService.id();
     return base.post({order: order}).then(function (order) {
       return order;
     });

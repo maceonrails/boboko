@@ -16,8 +16,7 @@ function LoginCtrl($scope, $http, $state, localStorageService, $rootScope, AuthS
     $scope.user = {}
     $ionicPopup.show({
       templateUrl: 'app/login/form.html',
-      title: 'Login',
-      subTitle: 'Please input email and password',
+      title: 'Bober Cafe',
       scope: $scope,
       buttons: [
         { text: 'Cancel', onTap: function(e) {ionic.Platform.exitApp();} },
@@ -55,7 +54,7 @@ function LoginCtrl($scope, $http, $state, localStorageService, $rootScope, AuthS
     $rootScope.host = localStorageService.get('host');
     $ionicPopup.show({
       template: '<label class="item item-input"><input type="text" ng-model="$root.host"></label>',
-      title: 'Add host target (ex: 192.168.1.251)',
+      title: 'Add host/IP',
       scope: $scope,
       buttons: [
         { text: 'Cancel', onTap: function(e) {ionic.Platform.exitApp();} },

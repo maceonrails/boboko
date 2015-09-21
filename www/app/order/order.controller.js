@@ -17,6 +17,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$scope.cancelSplit = cancelSplit;
 	$scope.removeOrder = removeOrder;
 	$scope.orderHeader = orderHeader;
+	$scope.splitOrder = splitOrder;
 
 	// Discount
 	$scope.addPercentDiscount = addPercentDiscount;
@@ -26,7 +27,8 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 
 	init();
 
-	$rootScope.show = ''
+	$rootScope.showLeft = ''
+	$rootScope.showRight = ''
 	$scope.split_order = {};
 	$scope.order = {}
 	$scope.order.order_items = []
@@ -62,6 +64,12 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 			$scope.split_order.table_id = order.table_id
 			$scope.split_order.waiting = order.waiting
 			$scope.split_order.servant_id = order.servant_id
+			
+			$scope.move_order.id = order.id
+			$scope.move_order.name = order.name
+			$scope.move_order.table_id = order.table_id
+			$scope.move_order.waiting = order.waiting
+			$scope.move_order.servant_id = order.servant_id
 		});
 	}
 
@@ -75,18 +83,18 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	}
 
 	function showMenu() {
-		$rootScope.show = 'menu';
+		$rootScope.showRight = 'menu';
 	};
 
 	function hideMenu() {
-		$rootScope.show = '';
+		$rootScope.showRight = '';
 	};
 
 	function showCalculator(order) {
-		if (order.type == "split") {
-			$rootScope.show = 'splitCalculator'
+		if (order.type == "move") {
+			$rootScope.showRight = 'splitCalculator'
 		} else {
-			$rootScope.show = 'orderCalculator'
+			$rootScope.showRight = 'orderCalculator'
 		}
 	};
 
@@ -94,17 +102,24 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 		$rootScope.show = 'split';
 	};
 
+	function splitOrder () {
+		$rootScope.showLeft = 'splitOrder';
+		$rootScope.showRight = '';
+	}
+
 	function showItemBox() {
-		$rootScope.show = 'move';
+		$rootScope.showRight = 'move';
 	};
 
 	function cancelMove (order, move_order) {
 		OrderService.cancelMove(order, move_order)
+		$rootScope.showRight = '';
+		$rootScope.showLeft = '';
 	}
 
 	function cancelSplit (order, split_order) {
-		OrderService.cancelSplit(order, split_order)
-		$rootScope.show = 'calculator'
+		// OrderService.cancelSplit(order, split_order)
+		$rootScope.showRight = 'move';
 	}
 
 	function addDiscount (order, discount) {
@@ -177,8 +192,8 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
  		$scope.order.note = '';
  		$scope.user = {};
 	 	$ionicPopup.show({
-	   	templateUrl: 'app/order/void-form.html',
-	   	title: 'Void Order',
+	   	templateUrl: 'app/order/oc-form.html',
+	   	title: 'Operational Cost',
 	   	subTitle: 'Please input reason',
 	   	scope: $scope,
 	   	buttons: [
@@ -188,18 +203,19 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	       	type: 'button-positive',
 	       	onTap: function(e) {
 	         	OrderService.ocOrder(order, $scope.user).then(function (res) {
+				 			order.order_items = []
 			 				$ionicPopup.alert({
-								title: 'Void Sukses',
+								title: 'OC Sukses',
 								scope: $scope,
-								template: '<center>Reason:<br><br> <b>{{ void.note }}</b> </center>'
+								template: '<center>OC sukses di simpan</center>'
 							}).then(function (res) {
 				 				console.log(res);
-				 				$state.go('main.dashboard');
+				 				// $state.go('main.dashboard');
 				 			})
 			 			}, function (res) {
 				 			$ionicPopup.alert({
 							  title: 'Kesalahan',
-							  template: 'Void gagal, silahkan ulangi.'
+							  template: 'OC gagal, silahkan ulangi.'
 							})
 				 		})
 	       	}
@@ -224,13 +240,14 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	       	type: 'button-positive',
 	       	onTap: function(e) {
 	         	OrderService.voidOrder(order, $scope.user).then(function (res) {
+	         		order.order_items = []
 			 				$ionicPopup.alert({
 								title: 'Void Sukses',
 								scope: $scope,
-								template: '<center>Reason:<br><br> <b>{{ $scope.user.note }}</b> </center>'
+								template: '<center><b>Void sudah di simpan</b></center>'
 							}).then(function (res) {
 				 				console.log(res);
-				 				$state.go('main.dashboard');
+				 				// $state.go('main.dashboard');
 				 			})
 			 			}, function (res) {
 				 			$ionicPopup.alert({
@@ -275,7 +292,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 			}).then(function (res) {
  				console.log(res);
  				$state.go('main.dashboard');
- 				$scope.refresh();
+ 				// $scope.refresh();
  			})
 		}, function (res) {
  			$ionicPopup.alert({
@@ -286,7 +303,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
  	}
 
  	function printSplitOrder (order) {
- 		OrderService.printSplitOrder(order).then(printCallback, printFailCallback)
+ 		OrderService.printSplitOrder(order).then(printSuccessCallback, printFailCallback)
  	}
 
  	function printOrder (order) {
@@ -300,7 +317,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 			template: '<center>Order sedang di cetak, silahkan tunggu</center>'
 		}).then(function (res) {
 			console.log(res);
-			$scope.refresh();
+			// $scope.refresh();
 		})
 	}
 

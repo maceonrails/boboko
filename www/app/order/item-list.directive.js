@@ -99,7 +99,6 @@ function erestoItemList(OrderService, TaxService){
 					           	e.preventDefault();
 					         	} else {
 					         		AuthService.authorizeUser($scope.user).then(function (res) {
-					         			debugger
 					         			$scope.orderItem.void_by = res.user.id;
 					         			$scope.orderItem.void_quantity = lastQuantity - $scope.orderItem.quantity;
 					         			PaymentService.voidItem($scope.orderItem).then(function (res) {
@@ -114,7 +113,6 @@ function erestoItemList(OrderService, TaxService){
 														template: '<center>Reason:<br><br> <b>{{ $scope.orderItem.void_note }}</b> </center>'
 													})
 									 			}, function (res) {
-									 				debugger
 									 				$scope.orderItem.quantity = lastQuantity
 										 			$ionicPopup.alert({
 													  title: 'Kesalahan',
@@ -123,7 +121,6 @@ function erestoItemList(OrderService, TaxService){
 					         			})
 					         		}, function (response) {
 					         			$scope.orderItem.quantity = lastQuantity
-					         			debugger
 					         		})
 					         	}
 					       	}

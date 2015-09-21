@@ -2,7 +2,7 @@ angular
   .module('eresto.payment.service', ['eresto.order.service', 'eresto.tax.service'])
   .factory('PaymentService', PaymentService)
 
-function PaymentService ($q, Restangular, OrderService, TaxService) {
+function PaymentService ($q, Restangular, OrderService, TaxService, AuthService) {
 	var sub_total;
 	var tax_amount;
 	var total;
@@ -62,6 +62,7 @@ function PaymentService ($q, Restangular, OrderService, TaxService) {
 
 	function payOrder (order) {
 		console.log(order.name)
+		order.cashier_id = AuthService.id();
 		return Restangular.one('orders', order.id).post("pay_order", order)
 	}
 

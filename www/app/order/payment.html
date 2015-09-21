@@ -19,25 +19,28 @@
 			</div>	
 		</div>
 	</div>
+
+	<div class="calculator-buttons-container cf">
+		<a ng-click="calcAddDigit('7')" class="btn-corner-rounded btn-rounded-secondary">7</a>
+		<a ng-click="calcAddDigit('8')" class="btn-corner-rounded btn-rounded-secondary">8</a>
+		<a ng-click="calcAddDigit('9')" class="btn-corner-rounded btn-rounded-secondary">9</a>
+		<a ng-click="calcAddMoney(10000)" class="btn-corner-rounded btn-rounded-primary">10.000</a>
+		<a ng-click="calcAddDigit('4')" class="btn-corner-rounded btn-rounded-secondary">4</a>
+		<a ng-click="calcAddDigit('5')" class="btn-corner-rounded btn-rounded-secondary">5</a>
+		<a ng-click="calcAddDigit('6')" class="btn-corner-rounded btn-rounded-secondary">6</a>
+		<a ng-click="calcAddMoney(50000)" class="btn-corner-rounded btn-rounded-primary">50.000</a>
+		<a ng-click="calcAddDigit('1')" class="btn-corner-rounded btn-rounded-secondary">1</a>
+		<a ng-click="calcAddDigit('2')" class="btn-corner-rounded btn-rounded-secondary">2</a>
+		<a ng-click="calcAddDigit('3')" class="btn-corner-rounded btn-rounded-secondary">3</a>
+		<a ng-click="calcAddMoney(100000)" class="btn-corner-rounded btn-rounded-primary">100.000</a>
+		<a ng-click="calcClear()" class="btn-corner-rounded btn-rounded-secondary btn-calc-clear">C</a>
+		<a ng-click="calcAddDigit('0')" class="btn-corner-rounded btn-rounded-secondary">0</a>
+		<a ng-click="calcAddDigit('00')" class="btn-corner-rounded btn-rounded-secondary">00</a>
+		<a ng-click="calcDelete()" class="btn-corner-rounded btn-rounded-secondary">Del</a>
+	</div>
 </div>
-<div class="calculator-buttons-container">
-	<a ng-click="calcAddDigit('7')" class="btn-corner-rounded btn-rounded-secondary">7</a>
-	<a ng-click="calcAddDigit('8')" class="btn-corner-rounded btn-rounded-secondary">8</a>
-	<a ng-click="calcAddDigit('9')" class="btn-corner-rounded btn-rounded-secondary">9</a>
-	<a ng-click="calcAddMoney(10000)" class="btn-corner-rounded btn-rounded-primary">10.000</a>
-	<a ng-click="calcAddDigit('4')" class="btn-corner-rounded btn-rounded-secondary">4</a>
-	<a ng-click="calcAddDigit('5')" class="btn-corner-rounded btn-rounded-secondary">5</a>
-	<a ng-click="calcAddDigit('6')" class="btn-corner-rounded btn-rounded-secondary">6</a>
-	<a ng-click="calcAddMoney(50000)" class="btn-corner-rounded btn-rounded-primary">50.000</a>
-	<a ng-click="calcAddDigit('1')" class="btn-corner-rounded btn-rounded-secondary">1</a>
-	<a ng-click="calcAddDigit('2')" class="btn-corner-rounded btn-rounded-secondary">2</a>
-	<a ng-click="calcAddDigit('3')" class="btn-corner-rounded btn-rounded-secondary">3</a>
-	<a ng-click="calcAddMoney(100000)" class="btn-corner-rounded btn-rounded-primary">100.000</a>
-	<a ng-click="calcClear()" class="btn-corner-rounded btn-rounded-secondary btn-calc-clear">C</a>
-	<a ng-click="calcAddDigit('0')" class="btn-corner-rounded btn-rounded-secondary">0</a>
-	<a ng-click="calcAddDigit('00')" class="btn-corner-rounded btn-rounded-secondary">00</a>
-	<a ng-click="calcDelete()" class="btn-corner-rounded btn-rounded-secondary">Del</a>
-</div>
-<div class="right-right-container">		
-	<a class="btn-rounded btn-done" ng-click="payAll(order, order_items)">Done</a>
+
+<div class="right-right-container">
+	<a ng-click="$parent.hideMenu()" class="btn-close"></a>
+	<a class="btn-rounded btn-done" ng-click="payAll(order)">Done</a>
 </div>
