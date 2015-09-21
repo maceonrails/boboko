@@ -2,6 +2,10 @@
 
 // For login
 
+h3.popup-title {
+  font-size: 24px;
+}
+
 .top-bar {
   position: fixed;
   top: 0;
@@ -102,7 +106,9 @@ h2 + h2, h2 + h3 {
 // override Ionic Css
 
 .popup-container .popup {
-	width: 370px;
+	width: 420px;
+	padding: 15px;
+	max-height: none;
 }
 
 
@@ -119,7 +125,7 @@ h2 + h2, h2 + h3 {
 }
  
 .cf {
-  // zoom: 1; /* ie 6/7 */
+  zoom: 1; /* ie 6/7 */
 }
 
 
@@ -396,6 +402,7 @@ div.left-container, div.right-container {
 	width: 638px;
 	height: 666px;
 	overflow-y: auto;
+	z-index: 99999999;
 }
 div.left-container {
 	float: left;
@@ -614,6 +621,16 @@ a.btn-transaction-cancel:after {
 	font-size: 21px;
 }
 
+a.btn-transaction-oc:after {
+	content: "OC";
+	font-size: 21px;
+}
+
+a.btn-transaction-move:after {
+	content: "Move";
+	font-size: 21px;
+}
+
 
 
 div.right-container {
@@ -649,6 +666,12 @@ div.calculator-container {
 
 div.calculator-displays-container {
 	margin-bottom: 4px;
+	width: 480px;
+	float: left;
+}
+div.calculator-buttons-container {
+	width: 480px;
+	margin-top: 10px;
 }
 
 div.calculator-display-lable-container {
@@ -830,11 +853,12 @@ div.calculator-small-screen {
 div.right-right-container {
 	// width: 112px;
 	width: 110px;
-	height: 20%;
+	height: 100%;
 	float: right;
 	margin: 0;
 	// background-color: green;
 	position: relative;
+
 }
 
 a.btn-done {

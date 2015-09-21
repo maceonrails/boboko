@@ -14,13 +14,17 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     payAll: payAll,
     saveOrder: saveOrder,
     printOrder: printOrder,
+    printSplitOrder: printSplitOrder,
     getTotal: getTotal,
     getPaidAmount: getPaidAmount, 
     getReturnAmount: getReturnAmount,
     addMenu: addMenu, 
-    moveFromSplit: moveFromSplit,
-    moveToSplit: moveToSplit,
-    cancelSplit: cancelSplit
+    moveFromBox: moveFromBox,
+    moveToBox: moveToBox,
+    // cancelSplit: cancelSplit,
+    cancelMove: cancelMove,
+    voidOrder: voidOrder,
+    ocOrder: ocOrder
   }
 
   function addMenu (product, order) {
@@ -36,6 +40,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     orderItem.pay_quantity = 0;
     orderItem.paid_quantity = 0;
     orderItem.printed_quantity = 0;
+    orderItem.take_away = true;
     orderItem.paid_amount = orderItem.quantity * product.price;
     var sameItem = false;
 
@@ -57,9 +62,9 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     return order;
   }
 
-  function moveToSplit (item, order, split_order) {
+  function moveToBox (item, order, move_order) {
     var sameItem = false
-    split_order.order_items.forEach(function (orderItem) {
+    move_order.order_items.forEach(function (orderItem) {
       if (orderItem === item) {
         item.pay_quantity++
         item.quantity--
@@ -74,25 +79,26 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     if (!sameItem) {
       item.quantity--
       item.pay_quantity++
-      split_order.order_items.push(item)
-      console.log('move to split', item)
+      move_order.order_items.push(item)
+      console.log('move to box', item)
       if (item.quantity == 0) {
         _.remove(order.order_items, {
           product_id: item.product_id
         });
       }
     }
+    console.log(item.pay_quantity)
   }
 
-  function moveFromSplit (item, split_order, order) {
+  function moveFromBox (item, move_order, order) {
     var sameItem = false
     order.order_items.forEach(function (orderItem) {
       if (orderItem === item) {
         item.pay_quantity--
         item.quantity++
-        console.log('move to split same item', item)
+        console.log('move to box same item', item)
         if (item.pay_quantity == 0) {
-          _.remove(split_order.order_items, {
+          _.remove(move_order.order_items, {
             product_id: item.product_id
           });
         }
@@ -105,30 +111,31 @@ function OrderService(Restangular, TaxService, $q, AuthService){
       order.order_items.push(item)
       console.log('move from split', item)
       if (item.pay_quantity == 0) {
-        _.remove(split_order.order_items, {
+        _.remove(move_order.order_items, {
           product_id: item.product_id
         });
       }
     }
+    console.log(item.pay_quantity)
   }
 
-  function cancelSplit (order, split_order) {
+  function cancelMove (order, move_order) {
     var sameItem = false
-    split_order.order_items.forEach(function (splitItem) {
+    move_order.order_items.forEach(function (item) {
       order.order_items.forEach(function (orderItem) {
-        if (splitItem === orderItem) {
+        if (item === orderItem) {
           orderItem.quantity += orderItem.pay_quantity
           orderItem.pay_quantity = 0
           sameItem = true
         }
       })
       if (!sameItem) {
-        splitItem.quantity += splitItem.pay_quantity
-        splitItem.pay_quantity = 0
-        order.order_items.push(splitItem)
+        item.quantity += item.pay_quantity
+        item.pay_quantity = 0
+        order.order_items.push(item)
       }
     })
-    split_order.order_items = [];
+    move_order.order_items = [];
   }
 
   function moveItem (item, fromOrder, toOrder) {
@@ -140,18 +147,26 @@ function OrderService(Restangular, TaxService, $q, AuthService){
   }
 
   function saveOrder (order) {
+    order.cashier_id = AuthService.id();
     return order.post("make_order", order)
   }
 
-  function printOrder (order, type) {
+  function printOrder (order) {
     order.order_items.forEach(function (orderItem) {
-      if (type == 'split') {
-        orderItem.print_quantity = orderItem.pay_quantity
-      } else {
-        orderItem.print_quantity = orderItem.quantity - orderItem.paid_quantity
-      }
+      orderItem.print_quantity = orderItem.quantity - orderItem.paid_quantity
     })
+    return saveAndPrint(order)
+  }
 
+  function printSplitOrder (order) {
+    order.order_items.forEach(function (orderItem) {
+      orderItem.print_quantity = orderItem.pay_quantity
+    })
+    return saveAndPrint(order)
+  }
+
+  function saveAndPrint (order) {
+    order.cashier_id = AuthService.id();
     return Restangular.one('orders', order.id).post("make_order", order).then(function (res) {
       return Restangular.one('orders', order.id).post("print_order", order)
     })
@@ -181,7 +196,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     var sub_total = 0
     order.order_items.forEach(function(orderItem) {
       if (orderItem.product_id)
-        if (order.type === 'split')
+        if (order.type === 'move')
           sub_total += orderItem.pay_quantity * orderItem.price;
         else if (order.type === 'void')
           sub_total += orderItem.void_quantity * orderItem.price;
@@ -195,7 +210,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
 
   function getItemSubTotal (order, orderItem) {
     if (orderItem.product_id)
-      if (order.type === 'split')
+      if (order.type === 'move')
         return orderItem.pay_quantity * orderItem.price;
       else if (order.type === 'void')
         return orderItem.void_quantity * orderItem.price;
@@ -243,6 +258,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
 
   function create(order) {
     order.cashier_id = AuthService.id();
+    order.servant_id = AuthService.id();
     return base.post({order: order}).then(function (order) {
       return order;
     });
@@ -276,4 +292,21 @@ function OrderService(Restangular, TaxService, $q, AuthService){
       return error;
     })
   }
+
+  function voidOrder (order, user) {
+    return Restangular.one('orders', order.id).post(
+      "void_order", 
+      {order_items: order.order_items}, 
+      {order_id: order.id, email: user.email, password: user.password, note: user.note}
+    )
+  }
+
+  function ocOrder (order, user) {
+    return Restangular.one('orders', order.id).post(
+      "oc_order", 
+      {order_items: order.order_items}, 
+      {order_id: order.id, email: user.email, password: user.password, note: user.note}
+    )
+  }
+
 }

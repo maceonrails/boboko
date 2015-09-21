@@ -79,14 +79,24 @@ function AuthService($q, $http, USER_ROLES, localStorageService, Restangular, TO
 
   loadUserCredentials();
 
-  var authorizeUser = function(user) {
+  var authorizeUserForDiscount = function(user) {
     return Restangular.all('users').customPOST(user, 'authorize_for_discount')
+  }
+
+  var authorizeUserForVoid = function(user) {
+    return Restangular.all('users').customPOST(user, 'authorize_for_void')
+  }
+
+  var authorizeUserForOc = function(user) {
+    return Restangular.all('users').customPOST(user, 'authorize_for_oc')
   }
 
   return {
     login: login,
     logout: logout,
-    authorizeUser: authorizeUser,
+    authorizeUserForDiscount: authorizeUserForDiscount,
+    authorizeUserForVoid: authorizeUserForVoid,
+    authorizeUserForOc: authorizeUserForOc,
     isAuthorized: isAuthorized,
     isAuthenticated: function() {return isAuthenticated;},
     username: function() {return username;},

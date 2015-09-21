@@ -2,7 +2,7 @@ angular
   .module('eresto.payment.service', ['eresto.order.service', 'eresto.tax.service'])
   .factory('PaymentService', PaymentService)
 
-function PaymentService ($q, Restangular, OrderService, TaxService) {
+function PaymentService ($q, Restangular, OrderService, TaxService, AuthService) {
 	var sub_total;
 	var tax_amount;
 	var total;
@@ -12,7 +12,7 @@ function PaymentService ($q, Restangular, OrderService, TaxService) {
 
 	return {
 		payOrder: payOrder,
-		voidOrder: voidOrder, 
+		// voidOrder: voidOrder, 
 		voidItem: voidItem, 
 		getPaymentInfo: getPaymentInfo
 	}
@@ -62,16 +62,8 @@ function PaymentService ($q, Restangular, OrderService, TaxService) {
 
 	function payOrder (order) {
 		console.log(order.name)
+		order.cashier_id = AuthService.id();
 		return Restangular.one('orders', order.id).post("pay_order", order)
-	}
-
-	function voidOrder (order, user, order_items) {
-		order_items.forEach(function (orderItem) {
-			orderItem.paid_amount = 0;
-			orderItem.void = true;
-			orderItem.void_note = order.void_note;
-		})
-		return order.post("void_order", {order_items: order_items}, {order_id: order.id, email: user.email, password: user.password});
 	}
 
 	function voidItem (orderItem) {

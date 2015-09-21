@@ -8,7 +8,7 @@ function erestoItemList(OrderService, TaxService){
 		// name: '',
 		// priority: 1,
 		// terminal: true,
-		scope: { order: "=", name: "=" }, // {} = isolate, true = child, false/undefined = no change
+		scope: { order: "=", name: "=", base_order: "=" }, // {} = isolate, true = child, false/undefined = no change
 		controller: controller,
 		// require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
 		restrict: 'EA', // E = Element, A = Attribute, C = Class, M = Comment
@@ -31,27 +31,23 @@ function erestoItemList(OrderService, TaxService){
 
 		function clickItem (orderItem) {
 
-			if ($scope.$root.show == 'split') {
-				if ($scope.order.type == 'split') {
-					moveFromSplit(orderItem)
+			if ($scope.$root.show == 'move') {
+				if ($scope.order.type == 'move') {
+					moveFromBox(orderItem)
 				} else {
-					moveToSplit(orderItem)
+					moveToBox(orderItem)
 				}
 			} else {
 				showItemDetail(orderItem)
 			}
 		}
 
-		function moveToSplit (orderItem) {
-			var split_order = $scope.$parent.split_order
-			var order = $scope.$parent.order
-			OrderService.moveToSplit(orderItem, order, split_order)
+		function moveToBox (orderItem) {
+			OrderService.moveToBox(orderItem, $scope.$parent.order, $scope.$parent.move_order)
 		}
 
-		function moveFromSplit (orderItem) {
-			var split_order = $scope.$parent.split_order
-			var order = $scope.$parent.order
-			OrderService.moveFromSplit(orderItem, split_order, order)
+		function moveFromBox (orderItem) {
+			OrderService.moveFromBox(orderItem, $scope.$parent.move_order, $scope.$parent.order)
 		}
 
 		function showItemDetail (orderItem) {
@@ -103,7 +99,6 @@ function erestoItemList(OrderService, TaxService){
 					           	e.preventDefault();
 					         	} else {
 					         		AuthService.authorizeUser($scope.user).then(function (res) {
-					         			debugger
 					         			$scope.orderItem.void_by = res.user.id;
 					         			$scope.orderItem.void_quantity = lastQuantity - $scope.orderItem.quantity;
 					         			PaymentService.voidItem($scope.orderItem).then(function (res) {
@@ -118,7 +113,6 @@ function erestoItemList(OrderService, TaxService){
 														template: '<center>Reason:<br><br> <b>{{ $scope.orderItem.void_note }}</b> </center>'
 													})
 									 			}, function (res) {
-									 				debugger
 									 				$scope.orderItem.quantity = lastQuantity
 										 			$ionicPopup.alert({
 													  title: 'Kesalahan',
@@ -127,7 +121,6 @@ function erestoItemList(OrderService, TaxService){
 					         			})
 					         		}, function (response) {
 					         			$scope.orderItem.quantity = lastQuantity
-					         			debugger
 					         		})
 					         	}
 					       	}

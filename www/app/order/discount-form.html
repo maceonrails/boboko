@@ -1,11 +1,11 @@
 <div class="list list-inset">
   <label class="item item-input item-stacked-label" ng-if="discount.type == 'amount'">
   	<span class="input-label">Jumlah discount</span>
-    <input type="text" placeholder="masukan jumlah dalam rupiah" ng-model="discount.amount">
+    <input type="number" placeholder="masukan jumlah dalam rupiah" ng-model="discount.amount">
   </label>
   <label class="item item-input item-stacked-label" ng-if="discount.type == 'percent'">
   	<span class="input-label">Jumlah discount</span>
-    <input type="text" placeholder="masukan nilai persentase (1 - 100)" ng-model="discount.percent">
+    <input type="number" placeholder="masukan nilai persentase (1 - 100)" ng-model="discount.percent">
   </label>
 </div>
 <center>Verification for discount</center>

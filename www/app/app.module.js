@@ -13,7 +13,8 @@ angular.module('eresto', [
   'eresto.discount.service',
   'eresto.menu.service',
   'eresto.table.service',
-  'eresto.auth.service'
+  'eresto.auth.service',
+  'eresto.shared'
 ])
 
 .run(function($rootScope, $ionicPlatform, localStorageService, Restangular) {

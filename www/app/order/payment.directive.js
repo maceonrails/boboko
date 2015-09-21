@@ -59,7 +59,7 @@ function erestoPayment(){
 			}
 		}
 
-		function payAll(order, order_items) {
+		function payAll(order) {
 	 		if (getPaidAmount(order) > order.cash_amount || order.cash_amount == 0) {
 	 			$ionicPopup.alert({
 					title: 'Kesalahan',
@@ -71,7 +71,8 @@ function erestoPayment(){
 					template: 'Discount lebih besar dari jumlah transaksi.'
 				})
 	 		} else {
- 				PaymentService.payOrder(order, order_items).then(function (order) {
+ 				PaymentService.payOrder(order).then(function (order) {
+ 					order.order_items = []
 	 				$ionicPopup.alert({
 						title: 'Pembayaran berhasil',
 						scope: $scope,
