@@ -12,18 +12,6 @@ angular
       .state('main.dashboard', {
         url: "/dashboard",
         cache: false,
-        resolve: {
-          tables: function (TableService) {
-            return TableService.getAll().then(function (tables) {
-              return _.groupBy(tables, 'location');
-            });
-          },
-          orders: function (OrderService) {
-            return OrderService.getWaitingOrders().then(function (orders) {
-              return orders;
-            });
-          }
-        },
         views: {
           'mainContent' :{
             controller:  "DashboardCtrl",

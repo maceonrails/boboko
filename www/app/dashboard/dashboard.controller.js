@@ -2,10 +2,12 @@ angular
 	.module('eresto.dashboard', [])
 	.controller('DashboardCtrl', DashboardCtrl)
 
-function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, localStorageService, tables, orders){
-	$scope.tables = tables
-	$rootScope.orders = orders;
+function DashboardCtrl($scope, $state, $ionicPopup, $rootScope, $timeout, TableService, OrderService, localStorageService){
+	$scope.tables = []
+	$rootScope.orders = []
 	$rootScope.init = init;
+
+	init()
 	
   function init() {
   	console.log('init')
