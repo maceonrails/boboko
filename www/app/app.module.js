@@ -2,8 +2,8 @@ angular.module('eresto', [
   'ionic',
   'eresto.config',
   'eresto.routes',
-  'eresto.controller',
   'eresto.constants',
+  'eresto.main',
   'eresto.login',
   'eresto.dashboard',
   'eresto.order',
@@ -14,7 +14,8 @@ angular.module('eresto', [
   'eresto.menu.service',
   'eresto.table.service',
   'eresto.auth.service',
-  'eresto.shared'
+  'eresto.shared', 
+  'jett.ionic.filter.bar'
 ])
 
 .run(function($rootScope, $ionicPlatform, localStorageService, Restangular) {

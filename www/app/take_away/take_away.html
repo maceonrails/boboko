@@ -1,0 +1,9 @@
+<div class="take-away-container">
+	<div class="take-away-header cf">
+		<h2 class="take-away-name">Take Away Queue</h2>
+		<a class="btn-add-queue" ng-click="addOrder()"></a>
+	</div>
+	<ul class="take-away-queue-container cf">
+		<li ng-click="showOrder(order.id)" ng-repeat="order in orders">{{order.name}}<span>#{{order.queue_number}}</span></li>
+	</ul>
+</div>

@@ -1,76 +1,66 @@
 angular
-  .module('eresto.app', ['http-auth-interceptor'])
-  .controller('AppCtrl', AppCtrl)
+  .module('eresto.main', ['http-auth-interceptor'])
+  .controller('MainCtrl', MainCtrl)
 
-function AppCtrl($rootScope, $scope, $state, AuthenticationService, $ionicPopup, localStorageService, $window) {
-  $scope.message = "";
-  $scope.isLogin = true;
-  $scope.user = {
-    username: null,
-    password: null
-  };
-  
-  $scope.login = function() {
-    AuthenticationService.login($scope.user);
+function MainCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, $rootScope, $log, $ionicLoading, $ionicSideMenuDelegate) {
+  $scope.username = AuthService.username();
+  $scope.name = AuthService.name();
+  $scope.$state = $state
+
+  $scope.toggleLeft = function() {
+    $ionicSideMenuDelegate.toggleLeft();
+    $rootScope.loadHistoryOrders();
   };
 
-  $scope.logout = function () {
-    AuthenticationService.logout();
-  }
+  $rootScope.goBack = function() {
+    $state.go('main.dashboard')
+  };
 
-  $scope.$on('event:auth-loginRequired', function(e, rejection) {
-    console.log('handling login required');
-    $scope.isLogin = false
-    $ionicPopup.alert({
-      title: 'Warning',
-      template: "Login required"
-    }).then(function (res) {
-      console.log(res);
-    })
-    // $state.go('auth.login', {}, {reload: true, inherit: false});
-  });
-  
+  $scope.logout = function() {
+    AuthService.logout();
+    $state.go('login');
+  };
  
-  $scope.$on('event:auth-loginConfirmed', function() {
-   $scope.username = null;
-   $scope.password = null;
-   $scope.isLogin = true;
-
-   $ionicPopup.alert({
-      title: 'Success',
-      template: "Login Success"
-    }).then(function (res) {
-      console.log(res);
-    })
-   // $state.go('auth.dashboard', {}, {reload: true, inherit: false});
+  $scope.$on(AUTH_EVENTS.notAuthorized, function(event) {
+    var alertPopup = $ionicPopup.alert({
+      title: 'Unauthorized!',
+      template: 'You are not allowed to access this resource.'
+    });
+  });
+ 
+  $scope.$on(AUTH_EVENTS.notAuthenticated, function(event) {
+    AuthService.logout();
+    $state.go('login');
+    var alertPopup = $ionicPopup.alert({
+      title: 'Session Lost!',
+      template: 'Sorry, You have to login again.'
+    });
   });
 
-  $rootScope.$on('host:show', function () {
-    showHostPopup();
+  // $scope.$on(AUTH_EVENTS.hostNotFound, function(event) {
+  //   setHost()
+  // });
+
+  $scope.$on(AUTH_EVENTS.badRequest, function(event) {
+    var alertPopup = $ionicPopup.alert({
+      title: 'Something wrong with server',
+      template: 'Please check host or call your administrator.'
+    });
+  });
+
+  $rootScope.$on('loading:show', function() {
+    $ionicLoading.show({
+      template: '<ion-spinner icon="android"></ion-spinner> <span class="spinner-text">Loading...</span>',
+      animation: 'fade-in',
+      showBackdrop: true,
+    })
   })
-  
-  $scope.$on('event:auth-login-failed', function(e, status) {
-    var error = "Login failed.";
-    if (status == 401) {
-      error = "Invalid Username or Password.";
-    }
-    $ionicPopup.alert({
-      title: 'Failed',
-      template: error
-    }).then(function (res) {
-      console.log(res);
-    })
-  });
+
+  $rootScope.$on('loading:hide', function() {
+    $ionicLoading.hide()
+  })
  
-  $scope.$on('event:auth-logout-complete', function() {
-    console.log("logout complete");
-    $scope.isLogin = false
-    $ionicPopup.alert({
-      title: 'Success',
-      template: "logout complete"
-    }).then(function (res) {
-      console.log(res);
-    })
-    // $state.go('auth.login', {}, {reload: true, inherit: false});
-  });     
+  $scope.setCurrentUsername = function(name) {
+    $scope.name = name;
+  };
 }

@@ -13,7 +13,7 @@ function erestoPayment(){
 		// require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
 		restrict: 'EA', // E = Element, A = Attribute, C = Class, M = Comment
 		// template: '',
-		templateUrl: 'app/order/payment.html',
+		templateUrl: 'app/payment/payment.html',
 		// replace: true,
 		// transclude: true,
 		// compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, elm, attrs){}})),
@@ -76,7 +76,7 @@ function erestoPayment(){
 	 				$ionicPopup.alert({
 						title: 'Pembayaran berhasil',
 						scope: $scope,
-						template: '<center>Kembali:<br><br> <b>{{getReturnAmount(order) | currency: "Rp "}}</b> </center>'
+						template: '<center>Kembali:<br><br> <h3>{{getReturnAmount(order) | currency: "Rp "}}</h3> </center>'
 					}).then(function (res) {
 		 				console.log(res);
 		 				$state.go('main.dashboard');

@@ -1,0 +1,22 @@
+<ion-side-menu side="left" width="300">
+  <ion-header-bar class='left'>
+    <h1 class="title">Find Order</h1>
+    <div class="buttons">
+      <button class="button button-icon ion-android-search" ng-click="showFilterBar()"></button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <ion-list class="list orders">
+      <ion-item class="item order" ng-repeat="order in historyOrders" ng-click="showOrder(order.id)">
+        <h3>
+          {{order.name}} 
+          <span ng-if="order.table_name">- table {{order.table_name}}</span>
+          <span ng-if="!order.table_name">- queue {{order.queue_number}}</span>
+        </h3>
+        <span>{{order.struck_id}}</span>
+      </ion-item>
+    </ion-list>
+    <ion-infinite-scroll ng-if="moreDataCanBeLoaded" icon="ion-loading-c" on-infinite="loadMoreData()" distance="10%">
+    </ion-infinite-scroll>
+  </ion-content>
+</ion-side-menu>

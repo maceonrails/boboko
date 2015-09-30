@@ -1,4 +1,7 @@
-@import 'reset';
+@import
+	"reset",
+  "www/lib/ionic/scss/ionic",
+  "www/lib/ionic-filter-bar/scss/ionic.filter.bar";
 
 // For login
 
@@ -11,13 +14,16 @@ h3.popup-title {
   top: 0;
   width: 100%;
   z-index: 999999;
+
+  .title {
+  	color: white;
+  }
 }
 
 .wrapper {
   height: 100%; // 100 viewport height
   width: 100%; // 100 viewport width
   max-height: 666px;
-  margin-top: 60px;
 }
 
 .login-wrapper {
@@ -31,7 +37,7 @@ h3.popup-title {
   margin: auto;
   z-index: 2;
   position: relative;
-  padding-top: 18%;
+  margin-top: 55px;
   height: 666px;
 }
 
@@ -67,6 +73,10 @@ a.button.button-icon.icon.ion-trash-a {
 
 .popup input.ng-touched, .popup input.ng-touched {
     padding: 10px;
+}
+
+.order-table-customer {
+	font-size: 16px;
 }
 
 .spinner-text {
@@ -167,12 +177,11 @@ a {
 	color: inherit;
 }
 
-div.top-bar {
-	width: 100%;
+.top-bar, .header {
 	box-sizing: border-box;
-	height: 60px;
+	// height: 60px;
 
-	padding: 5px 20px;
+	padding: 5px 5px;
 
 	background: -webkit-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Safari 5.1 to 6.0 */
 	background: -o-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Opera 11.1 to 12.0 */
@@ -186,7 +195,7 @@ div.page-heading {
 		font-family: $font-heading;
 		font-size: 24px;
 		font-weight: bold;
-		line-height: 53px;
+		line-height: 45px;
 		color: white;
     	text-shadow: 1px 1px rgba(0,0,0,.5);
 	}
@@ -199,7 +208,7 @@ div.account-tab {
 		font-family: $font-heading;
 		font-size: 18px;
 		font-weight: normal;
-		line-height: 53px;
+		line-height: 45px;
 		color: white;
     	text-shadow: 1px 1px rgba(0,0,0,.5);
 	}
@@ -221,7 +230,7 @@ div.tables-container {
 	width: 980px;
 	height: 666px;
 	margin: 0;
-	border-right: 2px solid $primary-color;
+	// border-right: 2px solid $primary-color;
 
 	// background-color: green;
 	background-color: #f6f6f6;
@@ -406,7 +415,7 @@ div.left-container, div.right-container {
 }
 div.left-container {
 	float: left;
-	border-right: 2px solid $primary-color;
+	// border-right: 2px solid $primary-color;
 
 	padding: 6px;
 }
@@ -421,6 +430,7 @@ div.order-table-properties {
 	margin-bottom: 10px;
 }
 h2.order-table-number {
+	margin-bottom: 5px;
 	font-size: 24px;
 	line-height: 29px;
 	font-weight: bold;
@@ -499,6 +509,7 @@ div.order-count-item {
 		text-align: right;
 		float: right;
 		line-height: 30px;
+		font-size: 18px;
 		font-weight: bold;
 		&.order-total {
 			font-size: 25px;
@@ -638,7 +649,7 @@ div.right-container {
 	height: 666px;
 
 	float: right;
-	border-left: 2px solid $primary-color;
+	// border-left: 2px solid $primary-color;
 	padding-top: 6px;
 	padding-bottom: 20px;
 	// padding-left: 36px;

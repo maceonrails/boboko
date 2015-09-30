@@ -12,6 +12,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$scope.ocOrder = ocOrder;
 	$scope.saveOrder = saveOrder;
 	$scope.printOrder = printOrder;
+	$scope.reprintOrder = reprintOrder;
 	$scope.printSplitOrder = printSplitOrder;
 	$scope.cancelMove = cancelMove;
 	$scope.cancelSplit = cancelSplit;
@@ -29,14 +30,8 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 
 	$rootScope.showLeft = ''
 	$rootScope.showRight = ''
-	$scope.split_order = {};
 	$scope.order = {}
 	$scope.order.order_items = []
-	$scope.split_order.order_items = []
-	$scope.split_order.type = 'split'
-	$scope.split_order.id = $stateParams.id
-	$scope.split_order.discount_amount = 0
-	$scope.split_order.cash_amount = 0
 
 	$scope.move_order = {};
 	$scope.move_order.order_items = []
@@ -58,12 +53,6 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 			$scope.order.discount_percent = 0
 			$scope.order.cash_amount = 0
 			$scope.itemBlank = order.order_items.length < 1
-
-			$scope.split_order.id = order.id
-			$scope.split_order.name = order.name
-			$scope.split_order.table_id = order.table_id
-			$scope.split_order.waiting = order.waiting
-			$scope.split_order.servant_id = order.servant_id
 			
 			$scope.move_order.id = order.id
 			$scope.move_order.name = order.name
@@ -103,8 +92,15 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	};
 
 	function splitOrder () {
-		$rootScope.showLeft = 'splitOrder';
-		$rootScope.showRight = '';
+		if ($scope.move_order.order_items.length < 1) {
+			$ionicPopup.alert({
+			  title: 'Kesalahan',
+			  template: 'Tidak ada item yang dipilih.'
+			})
+		} else {
+			$rootScope.showLeft = 'splitOrder';
+			$rootScope.showRight = '';
+		}
 	}
 
 	function showItemBox() {
@@ -120,6 +116,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	function cancelSplit (order, split_order) {
 		// OrderService.cancelSplit(order, split_order)
 		$rootScope.showRight = 'move';
+		$rootScope.showLeft = '';
 	}
 
 	function addDiscount (order, discount) {
@@ -189,6 +186,14 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
  	}
 
  	function ocOrder (order) {
+ 		if (order.order_items.length < 1) {
+			$ionicPopup.alert({
+			  title: 'Kesalahan',
+			  template: 'Tidak ada item yang dipilih.'
+			})
+			return false
+		}
+
  		$scope.order.note = '';
  		$scope.user = {};
 	 	$ionicPopup.show({
@@ -225,6 +230,13 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
  	}
 
  	function voidOrder (order) {
+ 		if (order.order_items.length < 1) {
+			$ionicPopup.alert({
+			  title: 'Kesalahan',
+			  template: 'Tidak ada item yang dipilih.'
+			})
+			return false
+		}
 
  		$scope.void = {};
  		$scope.user = {};
@@ -308,6 +320,10 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 
  	function printOrder (order) {
  		OrderService.printOrder(order).then(printSuccessCallback, printFailCallback)
+ 	}
+
+ 	function reprintOrder (order) {
+ 		OrderService.reprintOrder(order).then(printSuccessCallback, printFailCallback)
  	}
 
  	function printSuccessCallback(res) {

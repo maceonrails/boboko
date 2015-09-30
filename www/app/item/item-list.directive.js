@@ -13,7 +13,7 @@ function erestoItemList(OrderService, TaxService){
 		// require: 'ngModel', // Array = multiple requires, ? = optional, ^ = check parent elements
 		restrict: 'EA', // E = Element, A = Attribute, C = Class, M = Comment
 		// template: '',
-		templateUrl: 'app/order/item-list.html',
+		templateUrl: 'app/item/item-list.html',
 		// replace: true,
 		// transclude: true,
 		// compile: function(tElement, tAttrs, function transclude(function(scope, cloneLinkingFn){ return function linking(scope, elm, attrs){}})),
@@ -30,8 +30,9 @@ function erestoItemList(OrderService, TaxService){
 		$scope.getTax = getTax;
 
 		function clickItem (orderItem) {
-
-			if ($scope.$root.show == 'move') {
+			if (!$scope.order.waiting)
+				return false
+			if ($scope.$root.showRight == 'move') {
 				if ($scope.order.type == 'move') {
 					moveFromBox(orderItem)
 				} else {
@@ -54,7 +55,7 @@ function erestoItemList(OrderService, TaxService){
 	 		var lastQuantity = orderItem.quantity;
 	 		$scope.orderItem = orderItem;
 		 	$ionicPopup.show({
-		   	templateUrl: 'app/order/item-detail.html',
+		   	templateUrl: 'app/item/item-detail.html',
 		   	title: 'Order Item detail',
 		   	subTitle: 'Input quantity or write note',
 		   	scope: $scope,

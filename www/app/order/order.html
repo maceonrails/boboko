@@ -1,20 +1,25 @@
-<ion-view view-title="Order">
+<ion-view>
+	<ion-nav-buttons side="right">
+	  <button class="button button-icon icon ion-arrow-left-a light" ng-click="goBack()"></button>
+	</ion-nav-buttons>
   <ion-content scroll="false">
   	<div class="wrapper">
 	  	<div class="left-container" ng-hide="showLeft == 'splitOrder' || showLeft == 'splitCalculator'">
 				<div class="left-inner-container">
-					<a class="btn-add-order btn-disabled" ng-click="showMenu()"></a>
+					<a class="btn-add-order btn-disabled" ng-click="showMenu()" ng-if="order.waiting == true"></a>
 					
 					<div class="order-table-properties">
 						<h2 class="order-table-number">
 							Order {{ orderHeader(order) }} 
 							<a class="button button-icon icon ion-trash-a" ng-if="itemBlank" ng-click="removeOrder(order)"></a>
 						</h2>
-						<h3 class="order-table-customer">{{order.name}}</h3>
+						<h3 class="order-table-customer">{{order.name}}
+							<span ng-if="order.waiting == false"> - {{order.struck_id}}</span>
+						</h3>
 					</div>
 					<eresto-item-list order="order"> </eresto-item-list>
 				</div>
-				<ul class="transactional-buttons-container" ng-hide="showLeft == 'splitOrder' || showLeft == 'splitCalculator'">
+				<ul class="transactional-buttons-container" ng-if="order.waiting == true" ng-hide="showLeft == 'splitOrder' || showLeft == 'splitCalculator'">
 					<li>
 						<a class="btn-rounded btn-secondary btn-transaction-move" ng-click="showItemBox()"></a>
 						<p>Move</p>
@@ -38,6 +43,12 @@
 					<li>
 						<a class="btn-rounded btn-primary btn-transaction-pembayaran" ng-click="showCalculator(order)"></a>
 						<p>Pembayaran</p>
+					</li>
+				</ul>
+				<ul class="transactional-buttons-container" ng-if="order.waiting == false">
+					<li>
+						<a class="btn-rounded btn-secondary btn-transaction-print" ng-click="reprintOrder(order)"></a>
+						<p>Reprint</p>
 					</li>
 				</ul>
 			</div>

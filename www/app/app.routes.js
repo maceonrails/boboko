@@ -8,6 +8,7 @@ angular
         abstract: true,
         cache: false,
         templateUrl: "app/main/main.html",
+        controller: 'MainCtrl'
       })
       .state('main.dashboard', {
         url: "/dashboard",

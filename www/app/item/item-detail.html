@@ -1,7 +1,7 @@
 <div class="list list-inset" ng-if="orderItem.product.choices">
 
   <label class="item item-radio" ng-repeat="choice in orderItem.product.choices">
-    <input type="radio" ng-value="choice.name" ng-model="orderItem.choice">
+    <input type="radio" ng-value="choice.name" ng-model="orderItem.saved_choice">
     <div class="item-content">
       {{choice.name}}
     </div>

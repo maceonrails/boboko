@@ -14,6 +14,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     payAll: payAll,
     saveOrder: saveOrder,
     printOrder: printOrder,
+    reprintOrder: reprintOrder,
     printSplitOrder: printSplitOrder,
     getTotal: getTotal,
     getPaidAmount: getPaidAmount, 
@@ -24,7 +25,8 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     // cancelSplit: cancelSplit,
     cancelMove: cancelMove,
     voidOrder: voidOrder,
-    ocOrder: ocOrder
+    ocOrder: ocOrder,
+    getHistoryOrders: getHistoryOrders,
   }
 
   function addMenu (product, order) {
@@ -158,6 +160,13 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     return saveAndPrint(order)
   }
 
+  function reprintOrder (order) {
+    order.order_items.forEach(function (orderItem) {
+      orderItem.print_quantity = orderItem.paid_quantity
+    })
+    return Restangular.one('orders', order.id).post("print_order", order)
+  }
+
   function printSplitOrder (order) {
     order.order_items.forEach(function (orderItem) {
       orderItem.print_quantity = orderItem.pay_quantity
@@ -250,8 +259,14 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     return result
   }
 
-  function getWaitingOrders () {
-    return base.customGET("waiting_orders").then(function (orders) {
+  function getWaitingOrders (query) {
+    return base.customGET("waiting_orders", {q: query}).then(function (orders) {
+      return orders;
+    })
+  }
+
+  function getHistoryOrders (params) {
+    return base.customGET("history_orders", params).then(function (orders) {
       return orders;
     })
   }

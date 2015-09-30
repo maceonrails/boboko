@@ -1,0 +1,10 @@
+<div class="tables-container">
+	<div class="table-area-container" ng-repeat="(location, tables) in tables">
+		<div class="table-area-header">
+			<h2 class="table-area-name">{{location}}</h2>
+		</div>
+		<ul class="table-area-inner-container cf">
+			<li ng-click="showTable(table)" ng-repeat="table in tables" ng-class="{'table-occupied': table.order_id}">{{table.name}}</li>
+		</ul>
+	</div>
+</div>
