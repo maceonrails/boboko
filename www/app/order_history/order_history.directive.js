@@ -28,11 +28,21 @@ function erestoOrderHistory(){
     $scope.current_page = 1;
     $scope.page_size = 9;
     $scope.moreDataCanBeLoaded = true;
+    $scope.findOrder = findOrder
+    $scope.loadMoreData = loadMoreData
+    $scope.showFilterBar = showFilterBar
+    $scope.clearSearch = clearSearch
 
-    $scope.loadMoreData = function() {
+    function clearSearch () {
+    	$scope.searchKey = ''
+    	loadHistoryOrders()
+    }
+
+    function loadMoreData() {
       params = {
       	page: $scope.current_page,
-      	page_size: $scope.page_size
+      	page_size: $scope.page_size,
+      	q: $scope.searchKey
       };
 
       OrderService.getHistoryOrders(params).then(function(result) {
@@ -46,7 +56,7 @@ function erestoOrderHistory(){
       })
     };
 
-		$scope.showFilterBar = function () {
+		function showFilterBar() {
 	    $scope.filterBarInstance = $ionicFilterBar.show({
 	      items: $scope.historyOrders,
 	      update: function (filteredItems) {
@@ -68,7 +78,8 @@ function erestoOrderHistory(){
 			$scope.moreDataCanBeLoaded = true;
 			params = {
       	page: $scope.current_page,
-      	page_size: $scope.page_size
+      	page_size: $scope.page_size,
+      	q: $scope.searchKey
       };
 		  OrderService.getHistoryOrders(params).then(function (orders) {
 		    $scope.historyOrders = orders;
@@ -79,6 +90,10 @@ function erestoOrderHistory(){
 		function showOrder (order_id) {
 			console.log('show order')
 			$state.go('main.order', {id: order_id});
+		}
+
+		function findOrder (key) {
+			OrderService
 		}
 	}
 }
