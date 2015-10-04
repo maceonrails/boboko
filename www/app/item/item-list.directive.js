@@ -27,7 +27,47 @@ function erestoItemList(OrderService, TaxService){
 		$scope.getTaxAmount = getTaxAmount;
 		$scope.getTotal = getTotal;
 		$scope.getPaidAmount = getPaidAmount;
+		$scope.getDiscountAmount = getDiscountAmount;
 		$scope.getTax = getTax;
+		$scope.openDiscounts = openDiscounts;
+
+		function openDiscounts (orderItem) {
+			if (!$scope.order.waiting)
+				return false
+			if (orderItem.product.discounts.length) {
+				$scope.orderItem = orderItem;
+				var last_discount_id = orderItem.discount_id;
+				var discount;
+			 	$ionicPopup.show({
+			   	templateUrl: 'app/item/discount-list.html',
+			   	title: 'Discount list',
+			   	subTitle: 'Select discount',
+			   	scope: $scope,
+			   	buttons: [
+			   		{
+			   			text: 'Cancel',
+			   			onTap: function (e) {
+			      		orderItem.discount_id = last_discount_id
+			     		}
+			   		},
+			     	{
+			       	text: '<b>Pilih</b>',
+			       	type: 'button-positive',
+			      	onTap: function (e) {
+			      		discount = _.find(orderItem.product.discounts, function (discount) { return discount.id == orderItem.discount_id; });
+			      		orderItem.price = orderItem.default_price - discount.amount
+			     		}
+			     	},
+			   	]
+			 	})
+			} else {
+				$ionicPopup.alert({
+					title: 'Discount list',
+					scope: $scope,
+					template: '<center>Maaf, tidak ada discount untuk menu ini</center>'
+				})
+			}
+		}
 
 		function clickItem (orderItem) {
 			if (!$scope.order.waiting)
@@ -159,6 +199,10 @@ function erestoItemList(OrderService, TaxService){
 
 		function getPaidAmount(order) {
 			return OrderService.getPaidAmount(order);
+		}
+
+		function getDiscountAmount (order) {
+			return OrderService.getDiscountAmount(order);
 		}
 
 	}

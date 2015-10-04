@@ -27,6 +27,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     voidOrder: voidOrder,
     ocOrder: ocOrder,
     getHistoryOrders: getHistoryOrders,
+    getDiscountAmount: getDiscountAmount,
   }
 
   function addMenu (product, order) {
@@ -34,17 +35,27 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     orderItem.product_id = product.id;
     orderItem.product = {}
     orderItem.product.choices = product.choices
+    orderItem.product.discounts = product.discounts
     orderItem.order_id = order.id;
-    orderItem.price = product.price;
     orderItem.name = product.name;
     orderItem.picture = product.picture;
     orderItem.quantity = 1;
     orderItem.pay_quantity = 0;
     orderItem.paid_quantity = 0;
     orderItem.printed_quantity = 0;
+    orderItem.oc_quantity = 0;
+    orderItem.void_quantity = 0;
     orderItem.take_away = true;
     orderItem.paid_amount = orderItem.quantity * product.price;
+    orderItem.default_price = product.price;
+    orderItem.price = product.price;
     var sameItem = false;
+
+    if (product.discounts.length > 0) {
+      var discount = _.max(product.discounts, function (discount) { return discount.amount; });
+      orderItem.discount_id = discount.id
+      orderItem.price = orderItem.default_price - discount.amount
+    }
 
     order.order_items.forEach(function (orderItem) {
       if (orderItem.product_id === product.id) {
@@ -60,6 +71,8 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     orderItem.sub_total = (orderItem.quantity * product.price);
     orderItem.tax_amount = TaxService.calculateTax(orderItem.sub_total);
     orderItem.paid_amount = (orderItem.quantity * product.price) + orderItem.tax_amount;
+
+    console.log(order)
 
     return order;
   }
@@ -249,8 +262,24 @@ function OrderService(Restangular, TaxService, $q, AuthService){
   }
 
   function getPaidAmount (order) {
-    var result = getTotal(order) - order.discount_amount;
+    var result = getTotal(order) - order.total_discount;
     return result
+  }
+
+  function getDiscountAmount (order) {
+    var discount_products = 0
+    order.order_items.forEach(function (order_item) {
+      if (order.waiting == false) {
+        quantity = order_item.paid_quantity
+      } else {
+        quantity = order_item.quantity - order_item.paid_quantity - order_item.void_quantity - order_item.oc_quantity
+      }
+      
+      discount_products += (order_item.default_price - order_item.price) * quantity
+    })
+    console.log(order.discount_amount)
+    order.total_discount = (parseInt(order.discount_amount) || 0) + discount_products
+    return order.total_discount
   }
 
   function getReturnAmount (order) {

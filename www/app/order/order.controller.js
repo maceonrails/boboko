@@ -31,25 +31,21 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	$rootScope.showLeft = ''
 	$rootScope.showRight = ''
 	$scope.order = {}
+	$scope.order.total_discount = 0
 	$scope.order.order_items = []
 
-	$scope.move_order = {};
-	$scope.move_order.order_items = []
-	$scope.move_order.type = 'move'
-	$scope.move_order.id = $stateParams.id
-	$scope.move_order.discount_amount = 0
-	$scope.move_order.cash_amount = 0
-
-	$scope.order.subTotal = 0
-	$scope.order.taxAmount = 0
-	$scope.order.total = 0
-	$scope.order.tax = 0
-	$scope.order.paidAmount = 0
+	$scope.move_order = {
+		order_items: [],
+		type: 'move',
+		id: $stateParams.id,
+		discount_amount: 0,
+		cash_amount: 0
+	};
 	
 	function init() {
 		OrderService.find($stateParams.id).then(function (order) {
 			$scope.order = order
-			$scope.order.discount_amount = 0
+			$scope.order.total_discount = 0
 			$scope.order.discount_percent = 0
 			$scope.order.cash_amount = 0
 			$scope.itemBlank = order.order_items.length < 1

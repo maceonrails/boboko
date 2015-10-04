@@ -1,11 +1,9 @@
 <ion-side-menu side="left" width="300">
-  <ion-header-bar class='left'>
-    <div class="bar bar-header item-input-inset">
-      <label class="item-input-wrapper">
-        <i class="icon ion-ios-search placeholder-icon"></i>
-        <input type="search" placeholder="Search Order" ng-model="searchKey" ng-change="loadHistoryOrders()" ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1000, 'blur': 0} }" search-on-type="">
-      </label>
-    </div>
+  <ion-header-bar class='left item-input-inset'>
+    <label class="item-input-wrapper">
+      <i class="icon ion-ios-search placeholder-icon"></i>
+      <input type="search" placeholder="Search Order" ng-model="searchKey" ng-change="loadHistoryOrders()" ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1000, 'blur': 0} }" search-on-type="">
+    </label>
     <!-- <h1 class="title">Find Order</h1>
     <div class="buttons">
       <button class="button button-icon ion-android-search" ng-click="showFilterBar()"></button>

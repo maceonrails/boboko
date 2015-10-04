@@ -47,6 +47,10 @@ h3.popup-title {
 	
 }
 
+.popup .list-inset {
+	margin-top: 0px;	
+}
+
 .content {
 	// margin-top: 60px;
 }
@@ -64,6 +68,10 @@ h3.popup-title {
 // .login button.button {
 //   width: 675px;
 // }
+
+.default-price {
+	text-decoration: line-through;
+}
 
 a.button.button-icon.icon.ion-trash-a {
   display: inline-block;
@@ -410,7 +418,7 @@ div.left-container, div.right-container {
 	box-sizing: border-box;
 	width: 638px;
 	height: 666px;
-	overflow-y: auto;
+	// overflow-y: auto;
 	z-index: 99999999;
 }
 div.left-container {
@@ -493,7 +501,7 @@ table.order-list {
 	}
 }
 div.order-counts {
-	margin: 5px 0;
+	margin: 10px 0 0px;
 }
 div.order-count-item {
 	display: block;
@@ -640,6 +648,11 @@ a.btn-transaction-oc:after {
 a.btn-transaction-move:after {
 	content: "Move";
 	font-size: 21px;
+}
+
+a.btn-transaction-promo:after {
+	content: "Promo";
+	font-size: 18px;
 }
 
 

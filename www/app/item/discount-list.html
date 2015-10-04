@@ -1,0 +1,11 @@
+<div class="list list-inset">
+
+  <label class="item item-radio" ng-repeat="discount in orderItem.product.discounts">
+    <input type="radio" ng-value="discount.id" ng-model="orderItem.discount_id">
+    <div class="item-content">
+      {{discount.name}} - {{discount.amount | currency:"Rp "}}
+    </div>
+    <i class="radio-icon ion-checkmark"></i>
+  </label>
+
+</div>
