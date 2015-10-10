@@ -204,7 +204,6 @@ a {
 }
 
 div.page-heading {
-	// float: left;
 	h1 {
 		font-family: $font-heading;
 		font-size: 24px;
@@ -213,6 +212,7 @@ div.page-heading {
 		color: white;
     	text-shadow: 1px 1px rgba(0,0,0,.5);
 	}
+	float: left;
 }
 div.account-tab {
 	float: right;

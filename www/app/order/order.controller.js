@@ -45,8 +45,9 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	function init() {
 		OrderService.find($stateParams.id).then(function (order) {
 			$scope.order = order
-			$scope.order.total_discount = 0
-			$scope.order.discount_percent = 0
+			$scope.order.total_discount = OrderService.getDiscountAmount(order)
+			$scope.order.discount_percent = order.discount_percent
+			$scope.order.discount_amount = order.discount_amount
 			$scope.order.cash_amount = 0
 			$scope.itemBlank = order.order_items.length < 1
 			
@@ -116,10 +117,14 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	}
 
 	function addDiscount (order, discount) {
-			$scope.order = order;
-			$scope.user = {};
-			$scope.discount = discount;
-			$ionicPopup.show({
+		var previous_discount_amount = order.discount_amount
+		var previous_discount_percent = order.discount_percent
+		$scope.order = order
+		$scope.user = {}
+		$scope.discount = discount
+		$scope.discount.amount = parseInt(previous_discount_amount)
+		$scope.discount.percent = parseInt(previous_discount_percent)
+		$ionicPopup.show({
 	   	templateUrl: 'app/order/discount-form.html',
 	   	title: 'Need verification for discount',
 	   	subTitle: 'Please input email and password',
@@ -136,14 +141,16 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	       			e.preventDefault();
 	       		}
 	       		else if (discount.type == 'percent') {
-		       		if (!$scope.discount.percent || $scope.discount.percent > 100 || $scope.discount.percent < 0) {
+		       		if ($scope.discount.percent > 100 || $scope.discount.percent < 0) {
 		           	e.preventDefault();
 		         	} else {
 								AuthService.authorizeUserForDiscount($scope.user).then(function (res) {
 			         		order.discount_by = res.user.id
 									order.discount_amount = ($scope.discount.percent / 100) * OrderService.getSubTotal(order);
+									order.discount_percent = $scope.discount.percent
 					 			}, function (res) {
-					 				$scope.order.discount_amount = 0
+					 				order.discount_amount = previous_discount_amount
+					 				order.discount_percent = previous_discount_percent
 						 			$ionicPopup.alert({
 									  title: 'Kesalahan',
 									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
@@ -152,14 +159,16 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 							}
 	         	}
 	       		else {
-	       			if (!$scope.discount.amount || $scope.discount.amount > OrderService.getSubTotal($scope.order)) {
+	       			if ($scope.discount.amount > OrderService.getSubTotal(order)) {
 		           	e.preventDefault();
 		         	} else {
 		         		AuthService.authorizeUserForDiscount($scope.user).then(function (res) {
 			         		order.discount_by = res.user.id
 			         		order.discount_amount = $scope.discount.amount
+			         		order.discount_percent = 0
 					 			}, function (res) {
-					 				$scope.order.discount_amount = 0
+					 				order.discount_amount = previous_discount_amount
+					 				order.discount_percent = previous_discount_percent
 						 			$ionicPopup.alert({
 									  title: 'Kesalahan',
 									  template: 'Maaf user tidak terverifikasi, silahkan ulangi.'
