@@ -19,6 +19,7 @@ angular.module('eresto', [
 ])
 
 .run(function($rootScope, $ionicPlatform, localStorageService, Restangular) {
+  if(!localStorageService.get('host')) localStorageService.set('host', '192.168.1.251')
   Restangular.setBaseUrl('http://' + localStorageService.get('host') + '/v1')
   $ionicPlatform.ready(function() {
     if(window.Connection) {

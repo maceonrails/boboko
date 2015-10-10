@@ -271,6 +271,8 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     order.order_items.forEach(function (order_item) {
       if (order.waiting == false) {
         quantity = order_item.paid_quantity
+      } else if (order.type === 'move') {
+        quantity = order_item.pay_quantity
       } else {
         quantity = order_item.quantity - order_item.paid_quantity - order_item.void_quantity - order_item.oc_quantity
       }

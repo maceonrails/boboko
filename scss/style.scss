@@ -10,10 +10,10 @@ h3.popup-title {
 }
 
 .top-bar {
-  position: fixed;
+  // position: fixed;
   top: 0;
   width: 100%;
-  z-index: 999999;
+  // z-index: 999999;
 
   .title {
   	color: white;
@@ -38,7 +38,7 @@ h3.popup-title {
   margin: auto;
   z-index: 2;
   position: relative;
-  margin-top: 55px;
+  margin-top: 43px;
   height: 100%;
   // height: 666px;
 }
@@ -191,7 +191,7 @@ a {
 	box-sizing: border-box;
 	// height: 60px;
 
-	padding: 5px 5px;
+	// padding: 5px 5px;
 
 	background: -webkit-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Safari 5.1 to 6.0 */
 	background: -o-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Opera 11.1 to 12.0 */
@@ -199,8 +199,12 @@ a {
 	background: linear-gradient($primary-gradient-start, $primary-gradient-end); /* Standard syntax */
 }
 
+.bar.top-bar {
+	border-bottom: none;
+}
+
 div.page-heading {
-	float: left;
+	// float: left;
 	h1 {
 		font-family: $font-heading;
 		font-size: 24px;
