@@ -3,10 +3,7 @@ angular
 	.factory('TaxService', TaxService)
 
 function TaxService(Restangular, localStorageService){
-  var taxes = {
-    'PPn': 0.1,
-    'Service': 0
-  }
+  var taxes = {}
 
   Restangular.all("outlets").customGET('get').then(function (res) {
     for (var i in res.outlet.taxs) {
@@ -20,7 +17,8 @@ function TaxService(Restangular, localStorageService){
     changeTaxes: changeTaxes,
     calculateTax: calculateTax,
     getTaxes: getTaxes,
-    getTax: getTax
+    getTax: getTax,
+    taxes: taxes
   }
 
   function build () {
@@ -31,20 +29,21 @@ function TaxService(Restangular, localStorageService){
     }
   }
 
+  function getTaxes () {
+    return Restangular.all("outlets").customGET('get').then(function (res) {
+      return res.outlet.taxs
+    });
+  }
+  
+
   function getTax(tax) {
     return taxes[tax];
   }
 
-  function getTaxes() {
-    var taxes = {}
-    
-    return taxes;
-  }
-
-  function getTotalRate () {
-    var sum = 0;
+  function getTotalRate (taxes) {
+    var sum = 0.0;
     for(var tax in taxes) {
-      sum += taxes[tax];
+      sum += parseFloat(taxes[tax]);
     }
     return sum;
   }
@@ -55,7 +54,7 @@ function TaxService(Restangular, localStorageService){
     }
   }
 
-  function calculateTax (amount) {
-    return getTotalRate() * amount
+  function calculateTax (amount, taxes) {
+    return getTotalRate(taxes) * amount
   }
 }

@@ -242,8 +242,8 @@ function OrderService(Restangular, TaxService, $q, AuthService){
       return 0;
   }
 
-  function getTaxAmount (order) {
-    return TaxService.calculateTax(getSubTotal(order));
+  function getTaxAmount (order, taxes) {
+    return TaxService.calculateTax(getSubTotal(order), taxes);
   }
 
   function getTax (tax) {
@@ -256,13 +256,13 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     })
   }
 
-  function getTotal (order) {
-    var result = getSubTotal(order) + getTaxAmount(order);
+  function getTotal (order, taxes) {
+    var result = getSubTotal(order) + getTaxAmount(order, taxes);
     return result
   }
 
-  function getPaidAmount (order) {
-    var result = getTotal(order) - order.total_discount;
+  function getPaidAmount (order, taxes) {
+    var result = getTotal(order, taxes) - order.total_discount;
     return result
   }
 

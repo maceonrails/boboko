@@ -33,28 +33,40 @@
 	</tbody>
 </table>
 <div class="order-counts cf">
-	<div class="order-count-item">
-		<p>Diskon</p>
-		<h2>{{getDiscountAmount(order) | currency:"Rp ":0}}</h2>
+	<div class="left-count">
+		<div class="order-count-item">
+			<p>Diskon</p>
+			<h2>{{getDiscountAmount(order) | currency:"Rp ":0}}</h2>
+		</div>
+		
+		<!-- <div class="order-count-item">
+			<p>PPN</p>
+			<h2>{{getTax('PPn', order) | currency:"Rp ":0}}</h2>
+		</div>
+		
+		<div class="order-count-item">
+			<p>Service</p>
+			<h2>{{getTax('Service', order) | currency:"Rp ":0}}</h2>
+		</div> -->
+
+		<div class="order-count-item" ng-repeat="(name, amount) in taxes">
+			<p>{{name}}</p>
+			<h2>{{getTax(amount, order) | currency:"Rp ":0}}</h2>
+		</div>
+
 	</div>
-	<div class="order-count-item">
-		<p>Sub-Total</p>
-		<h2>{{getSubTotal(order) | currency:"Rp ":0}}</h2>
-	</div>
-	<div class="order-count-item">
-		<p>PPN</p>
-		<h2>{{getTax('PPn', order) | currency:"Rp ":0}}</h2>
-	</div>
-	<div class="order-count-item">
-		<p>TOTAL</p>
-		<h2 class="order-total">{{getTotal(order) | currency:"Rp ":0}}</h2>
-	</div>
-	<div class="order-count-item">
-		<p>Service</p>
-		<h2>{{getTax('Service', order) | currency:"Rp ":0}}</h2>
-	</div>
-	<div class="order-count-item">
-		<p>Ditagihkan</p>
-		<h2 class="order-total-charge">{{getPaidAmount(order) | currency:"Rp ":0}}</h2>
+	<div class="right-count">
+		<div class="order-count-item">
+			<p>Sub-Total</p>
+			<h2>{{getSubTotal(order) | currency:"Rp ":0}}</h2>
+		</div>
+		<div class="order-count-item">
+			<p>TOTAL</p>
+			<h2 class="order-total">{{getTotal(order) | currency:"Rp ":0}}</h2>
+		</div>
+		<div class="order-count-item">
+			<p>Ditagihkan</p>
+			<h2 class="order-total-charge">{{getPaidAmount(order) | currency:"Rp ":0}}</h2>
+		</div>
 	</div>
 </div>

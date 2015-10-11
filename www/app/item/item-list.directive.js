@@ -30,6 +30,15 @@ function erestoItemList(OrderService, TaxService){
 		$scope.getDiscountAmount = getDiscountAmount;
 		$scope.getTax = getTax;
 		$scope.openDiscounts = openDiscounts;
+		$scope.taxes = {}
+
+		init()
+
+		function init () {
+			TaxService.getTaxes().then(function (res) {
+				$scope.taxes = res
+			});
+		}
 
 		function openDiscounts (orderItem) {
 			if (!$scope.order.waiting)
@@ -190,15 +199,15 @@ function erestoItemList(OrderService, TaxService){
 		}
 
 		function getTotal(order) {
-			return OrderService.getTotal(order);
+			return OrderService.getTotal(order, $scope.taxes);
 		}
 
-		function getTax(tax, order) {
-			return TaxService.getTax(tax) * OrderService.getSubTotal(order);
+		function getTax(amount, order) {
+			return parseFloat(amount) * OrderService.getSubTotal(order);
 		}
 
 		function getPaidAmount(order) {
-			return OrderService.getPaidAmount(order);
+			return OrderService.getPaidAmount(order, $scope.taxes);
 		}
 
 		function getDiscountAmount (order) {
