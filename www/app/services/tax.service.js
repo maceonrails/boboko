@@ -55,6 +55,6 @@ function TaxService(Restangular, localStorageService){
   }
 
   function calculateTax (amount, taxes) {
-    return getTotalRate(taxes) * amount
+    return getTotalRate(taxes)/100 * amount
   }
 }

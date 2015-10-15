@@ -203,7 +203,7 @@ function erestoItemList(OrderService, TaxService){
 		}
 
 		function getTax(amount, order) {
-			return parseFloat(amount) * OrderService.getSubTotal(order);
+			return parseFloat(amount)/100 * OrderService.getSubTotal(order);
 		}
 
 		function getPaidAmount(order) {
