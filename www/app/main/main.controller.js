@@ -2,7 +2,7 @@ angular
   .module('eresto.main', ['http-auth-interceptor'])
   .controller('MainCtrl', MainCtrl)
 
-function MainCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, $rootScope, $log, $ionicLoading, $ionicSideMenuDelegate) {
+function MainCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, $rootScope, $log, $ionicLoading, $ionicSideMenuDelegate, Restangular) {
   $scope.username = AuthService.username();
   $scope.name = AuthService.name();
   $scope.$state = $state
@@ -17,8 +17,16 @@ function MainCtrl($scope, $state, $ionicPopup, AuthService, AUTH_EVENTS, $rootSc
   };
 
   $scope.logout = function() {
-    AuthService.logout();
-    $state.go('login');
+    $ionicPopup.confirm({
+      title: 'Print rekap',
+      template: 'Print out rekap?'
+    }).then(function(res) {
+      if(res) {
+        Restangular.one('users', AuthService.id()).getList('rekap')
+      }
+      AuthService.logout();
+      $state.go('login');
+    });
   };
  
   $scope.$on(AUTH_EVENTS.notAuthorized, function(event) {

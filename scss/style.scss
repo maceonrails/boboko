@@ -695,10 +695,19 @@ div.right-container {
 	// background-color: yellow;
 }
 
+.spliter {
+  height: 108px;
+}
+
+.right-right-container .btn-corner-rounded.btn-rounded-primary{
+  color: black;
+  background: linear-gradient(#fff, #e5e5e5);
+}
+
 div.calculator-container {
 	// width: 100%;
 	height: 100%;
-	margin-left: 26px;
+	margin-left: 8px;
 	// background-color: yellow;
 
 	float: left;

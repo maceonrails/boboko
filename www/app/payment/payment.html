@@ -7,15 +7,15 @@
 	<div class="calculator-display-screen-container cf">
 		<div class="calculator-display-screen calculator-large-screen cf">
 			<div>
-				<h2>{{getPaidAmount(order) | currency:"Rp ":0}}</h2>
+				<h2>{{getRemainAmount(order, taxes) | currency:"Rp ":0}}</h2>
 			</div>
 			<div>
-				<h2>{{order.cash_amount | currency:"Rp ":0}}</h2>
+				<h2>{{order.pay_amount | currency:"Rp ":0}}</h2>
 			</div>
 		</div>
 		<div class="calculator-display-screen calculator-small-screen">
 			<div>		
-				<h2>{{getReturnAmount(order) | currency:"Rp ":0}}</h2>
+				<h2>{{order.return_amount | currency:"Rp ":0}}</h2>
 			</div>	
 		</div>
 	</div>
@@ -41,6 +41,11 @@
 </div>
 
 <div class="right-right-container">
-	<a ng-click="$parent.hideMenu()" class="btn-close"></a>
-	<a class="btn-rounded btn-done" ng-click="payAll(order)">Done</a>
+	<a ng-click="hideMenu()" class="btn-close"></a>
+	<div class="spliter">
+	</div>
+	<a ng-click="cashPayment()" class="btn-corner-rounded btn-rounded-primary">Cash</a>
+	<a ng-click="debitPayment()" class="btn-corner-rounded btn-rounded-primary">Debit</a>
+	<a ng-click="creditPayment()" class="btn-corner-rounded btn-rounded-primary">Credit</a>
+	<a class="btn-rounded btn-done" ng-click="payAll(order, taxes)">Done</a>
 </div>

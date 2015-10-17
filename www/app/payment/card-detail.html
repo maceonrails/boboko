@@ -1,0 +1,9 @@
+<div class="list">
+	<center><h4>Jumlah {{card.type}} : {{(order.pay_amount || order[card.type + '_amount']) | currency:"Rp ":0}}</h4></center>
+  <label class="item item-input">
+    <input type="text" placeholder="card name (mandiri, bca, dll)" ng-model="card.name">
+  </label>
+  <label class="item item-input">
+    <input type="number" placeholder="card number" ng-model="card.number">
+  </label>
+</div>

@@ -28,6 +28,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     ocOrder: ocOrder,
     getHistoryOrders: getHistoryOrders,
     getDiscountAmount: getDiscountAmount,
+    getRemainAmount: getRemainAmount,
   }
 
   function addMenu (product, order) {
@@ -83,7 +84,7 @@ function OrderService(Restangular, TaxService, $q, AuthService){
       if (orderItem === item) {
         item.pay_quantity++
         item.quantity--
-        if (item.quantity == 0) {
+        if (item.quantity - orderItem.paid_quantity - orderItem.void_quantity - orderItem.oc_quantity == 0) {
           _.remove(order.order_items, {
             product_id: item.product_id
           });
@@ -266,6 +267,11 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     return result
   }
 
+  function getRemainAmount (order, taxes) {
+    var result = getTotal(order, taxes) - order.total_discount - order.cash_amount - order.credit_amount - order.debit_amount;
+    return result > 0 ? result : 0
+  }
+
   function getDiscountAmount (order) {
     var discount_products = 0
     order.order_items.forEach(function (order_item) {
@@ -284,9 +290,9 @@ function OrderService(Restangular, TaxService, $q, AuthService){
     return order.total_discount
   }
 
-  function getReturnAmount (order) {
-    var paid_amount = getPaidAmount(order)
-    var result = paid_amount > order.cash_amount ? 0 : order.cash_amount - paid_amount;
+  function getReturnAmount (order, taxes) {
+    var paid_amount = getPaidAmount(order, taxes)
+    var result = paid_amount > order.pay_amount ? 0 : order.pay_amount - paid_amount;
     return result
   }
 

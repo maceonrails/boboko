@@ -39,7 +39,7 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 		type: 'move',
 		id: $stateParams.id,
 		discount_amount: 0,
-		cash_amount: 0
+		pay_amount: 0
 	};
 	
 	function init() {
@@ -48,7 +48,11 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 			$scope.order.total_discount = OrderService.getDiscountAmount(order)
 			$scope.order.discount_percent = order.discount_percent
 			$scope.order.discount_amount = order.discount_amount
-			$scope.order.cash_amount = 0
+			$scope.order.pay_amount = 0
+			$scope.order.return_amount = 0
+			$scope.order.cash_amount = order.cash_amount || 0
+			$scope.order.credit_amount = order.credit_amount || 0
+			$scope.order.debit_amount = order.debit_amount || 0
 			$scope.itemBlank = order.order_items.length < 1
 			
 			$scope.move_order.id = order.id
@@ -56,6 +60,11 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 			$scope.move_order.table_id = order.table_id
 			$scope.move_order.waiting = order.waiting
 			$scope.move_order.servant_id = order.servant_id
+			$scope.move_order.pay_amount = 0
+			$scope.move_order.return_amount = 0
+			$scope.move_order.cash_amount = order.cash_amount || 0
+			$scope.move_order.credit_amount = order.credit_amount || 0
+			$scope.move_order.debit_amount = order.debit_amount || 0
 		});
 	}
 
@@ -79,7 +88,9 @@ function OrderCtrl($rootScope, $scope, $stateParams, $state, OrderService, $ioni
 	function showCalculator(order) {
 		if (order.type == "move") {
 			$rootScope.showRight = 'splitCalculator'
+			init()
 		} else {
+			init()
 			$rootScope.showRight = 'orderCalculator'
 		}
 	};
