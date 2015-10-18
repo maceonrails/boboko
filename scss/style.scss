@@ -218,7 +218,7 @@ div.page-heading {
 .left-count, .right-count {
   width: 49%;
   display: block;
-  height: 100px;
+  height: 90px;
   float: left;
 }
 
@@ -503,7 +503,7 @@ table.order-list {
 	}
 	tbody {
 		width:100%;	
-		height: 330px;
+		height: 320px;
 		display: block;
 		overflow-y: scroll;
 		overflow-x: hidden;
@@ -697,11 +697,6 @@ div.right-container {
 
 .spliter {
   height: 108px;
-}
-
-.right-right-container .btn-corner-rounded.btn-rounded-primary{
-  color: black;
-  background: linear-gradient(#fff, #e5e5e5);
 }
 
 div.calculator-container {
@@ -908,7 +903,7 @@ div.calculator-small-screen {
 div.right-right-container {
 	// width: 112px;
 	width: 110px;
-	height: 100%;
+	height: 96%;
 	float: right;
 	margin: 0;
 	// background-color: green;
@@ -937,6 +932,14 @@ a.btn-done {
 		background: -o-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Opera 11.1 to 12.0 */
 		background: -moz-linear-gradient($primary-gradient-start, $primary-gradient-end); /* For Firefox 3.6 to 15 */
 		background: linear-gradient($primary-gradient-start, $primary-gradient-end); /* Standard syntax */	
+}
+
+.right-right-container .btn-corner-rounded.btn-rounded-primary{
+  color: black !important;
+  background: -webkit-linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* For Firefox 3.6 to 15 */
+	background: linear-gradient($secondary-gradient-start, $secondary-gradient-end); /* Standard syntax */	
 }
 
 @import 'add-order';
